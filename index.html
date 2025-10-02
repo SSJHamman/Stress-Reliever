@@ -3,142 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stress Reliever Playground</title>
+<title>Ultimate Stress Reliever Playground</title>
 <style>
   body {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    margin: 0;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    margin:0;
+    background: linear-gradient(135deg,#a1c4fd,#c2e9fb);
+    font-family: Arial, sans-serif;
     overflow-x: hidden;
   }
   h1 {
-    text-align: center;
-    color: #fff;
-    text-shadow: 2px 2px #000;
-    margin-top: 20px;
+    text-align:center;
+    color:#333;
+    margin-top:20px;
   }
   .section {
-    padding: 40px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 30px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:40px;
+    margin:40px 0;
   }
-  button, .color-box, .draggable {
-    cursor: pointer;
-    border: none;
-    outline: none;
-    padding: 15px 25px;
-    font-size: 16px;
-    border-radius: 10px;
-    transition: transform 0.2s, background 0.2s;
+  /* Bubble Wrap */
+  .bubble-wrap {
+    display:grid;
+    grid-template-columns: repeat(10,40px);
+    grid-gap:5px;
   }
-  button:hover {
-    transform: scale(1.2);
+  .bubble {
+    width:40px;
+    height:40px;
+    background:#00bfff;
+    border-radius:50%;
+    box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3);
+    cursor:pointer;
+    transition: transform 0.1s;
   }
-  .color-box {
-    width: 100px;
-    height: 100px;
-    border: 3px solid #fff;
+  .bubble.popped {
+    background:#c0c0c0;
+    transform: translateY(5px);
   }
-  .draggable {
-    width: 80px;
-    height: 80px;
-    background-color: #00f;
-    position: absolute;
-    top: 400px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
+  /* Zen Garden */
+  #zen {
+    border:2px solid #333;
+    border-radius:10px;
+    width:400px;
+    height:300px;
+    cursor:crosshair;
   }
-  canvas {
-    border: 3px solid #fff;
-    border-radius: 15px;
+  /* Fidget Spinner */
+  .spinner-container {
+    position:relative;
+    width:200px;
+    height:200px;
+  }
+  .spinner {
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    background:#ff4081;
+    position:absolute;
+    top:0;
+    left:0;
+    transform-origin:center;
+    transition: transform 0.05s linear;
+    box-shadow: 0 0 20px #ff4081;
+  }
+  /* Pop-it */
+  .popit {
+    display:grid;
+    grid-template-columns: repeat(6,50px);
+    grid-gap:5px;
+  }
+  .popit-bubble {
+    width:50px;
+    height:50px;
+    background:#ffeb3b;
+    border-radius:50%;
+    box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3);
+    cursor:pointer;
+    transition: transform 0.1s;
+  }
+  .popit-bubble.popped {
+    transform: translateY(5px);
+    background:#fbc02d;
   }
 </style>
 </head>
 <body>
+<h1>Ultimate Stress Reliever Playground</h1>
 
-<h1>Stress Reliever Playground</h1>
-
-<!-- Button Click Fun -->
+<!-- Bubble Wrap -->
 <div class="section">
-  <button onclick="changeBackground()">🌈 Change Background!</button>
-  <button onclick="playSound()">🔊 Play Sound</button>
-  <button onclick="alert('You clicked me! 🎉')">Click Me!</button>
+  <div>
+    <h2 style="text-align:center;">Bubble Wrap 🫧</h2>
+    <div class="bubble-wrap" id="bubbleWrap"></div>
+  </div>
+
+<!-- Zen Garden -->
+  <div>
+    <h2 style="text-align:center;">Zen Garden 🪷</h2>
+    <canvas id="zen"></canvas>
+  </div>
 </div>
 
-<!-- Color Changer -->
+<!-- Fidget Spinner -->
 <div class="section">
-  <div class="color-box" onclick="changeColor(this)"></div>
-  <div class="color-box" onclick="changeColor(this)"></div>
-  <div class="color-box" onclick="changeColor(this)"></div>
-</div>
+  <div>
+    <h2 style="text-align:center;">Fidget Spinner 🌀</h2>
+    <div class="spinner-container">
+      <div class="spinner" id="spinner"></div>
+    </div>
+  </div>
 
-<!-- Mini Canvas Game -->
-<div class="section">
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
+<!-- Pop-it -->
+  <div>
+    <h2 style="text-align:center;">Pop-it Board</h2>
+    <div class="popit" id="popit"></div>
+  </div>
 </div>
-
-<!-- Draggable Object -->
-<div class="draggable" id="dragMe"></div>
 
 <script>
-// Background changer
-function changeBackground() {
-  const colors = ['#ff9a9e', '#a18cd1', '#fbc2eb', '#fad0c4', '#ffecd2', '#cfd9df'];
-  document.body.style.background = `linear-gradient(135deg, ${colors[Math.floor(Math.random()*colors.length)]}, ${colors[Math.floor(Math.random()*colors.length)]})`;
+// ================== Bubble Wrap ==================
+const bubbleWrap = document.getElementById("bubbleWrap");
+for(let i=0;i<50;i++){
+  const b = document.createElement("div");
+  b.classList.add("bubble");
+  b.addEventListener('click',()=>{
+    if(!b.classList.contains("popped")){
+      b.classList.add("popped");
+      new Audio('https://www.soundjay.com/button/sounds/button-16.mp3').play();
+    }
+  });
+  bubbleWrap.appendChild(b);
 }
 
-// Sound effect
-function playSound() {
-  const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
-  audio.play();
-}
-
-// Color box changer
-function changeColor(box) {
-  const colors = ['red','blue','yellow','green','orange','purple','#ff69b4'];
-  box.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-}
-
-// Draggable object
-const dragItem = document.getElementById("dragMe");
-let isDragging = false;
-let offsetX, offsetY;
-
-dragItem.addEventListener('mousedown', e => {
-  isDragging = true;
-  offsetX = e.offsetX;
-  offsetY = e.offsetY;
+// ================== Zen Garden ==================
+const canvas = document.getElementById("zen");
+const ctx = canvas.getContext("2d");
+let isRaking = false;
+let lastPos = {x:0,y:0};
+canvas.addEventListener('mousedown', e => {
+  isRaking = true;
+  lastPos = {x:e.offsetX, y:e.offsetY};
 });
+canvas.addEventListener('mouseup', e => isRaking=false);
+canvas.addEventListener('mousemove', e => {
+  if(!isRaking) return;
+  ctx.strokeStyle = "#8B4513";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(lastPos.x,lastPos.y);
+  ctx.lineTo(e.offsetX,e.offsetY);
+  ctx.stroke();
+  lastPos = {x:e.offsetX, y:e.offsetY};
+});
+ctx.fillStyle = "#f5deb3";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+// ================== Fidget Spinner ==================
+const spinner = document.getElementById("spinner");
+let angle = 0;
+let spinning = false;
+spinner.addEventListener('mousedown', () => spinning = true);
+document.addEventListener('mouseup', () => spinning = false);
 document.addEventListener('mousemove', e => {
-  if(isDragging){
-    dragItem.style.left = (e.pageX - offsetX) + 'px';
-    dragItem.style.top = (e.pageY - offsetY) + 'px';
+  if(spinning){
+    angle += 20;
+    spinner.style.transform = `rotate(${angle}deg)`;
   }
 });
-document.addEventListener('mouseup', () => isDragging = false);
 
-// Mini game: bouncing ball
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-let ball = {x:200, y:200, dx:3, dy:3, radius:20, color:'#fff'};
-function drawBall(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
-  ctx.fillStyle = ball.color;
-  ctx.fill();
-  ctx.closePath();
-  ball.x += ball.dx;
-  ball.y += ball.dy;
-  if(ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.dx *= -1;
-  if(ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) ball.dy *= -1;
-  requestAnimationFrame(drawBall);
+// ================== Pop-it Board ==================
+const popit = document.getElementById("popit");
+for(let i=0;i<36;i++){
+  const b = document.createElement("div");
+  b.classList.add("popit-bubble");
+  b.addEventListener('click',()=>{
+    b.classList.toggle("popped");
+    new Audio('https://www.soundjay.com/button/sounds/button-16.mp3').play();
+  });
+  popit.appendChild(b);
 }
-drawBall();
 </script>
-
 </body>
 </html>
