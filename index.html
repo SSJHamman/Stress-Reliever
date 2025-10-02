@@ -3,110 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Stress Reliever Playground</title>
+<title>Ultimate Realistic Stress Playground</title>
 <style>
-  body {
-    margin:0;
-    background: linear-gradient(135deg,#a1c4fd,#c2e9fb);
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
-  }
-  h1 {
-    text-align:center;
-    color:#333;
-    margin-top:20px;
-  }
-  .section {
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:40px;
-    margin:40px 0;
-  }
-  /* Bubble Wrap */
-  .bubble-wrap {
-    display:grid;
-    grid-template-columns: repeat(10,40px);
-    grid-gap:5px;
-  }
-  .bubble {
-    width:40px;
-    height:40px;
-    background:#00bfff;
-    border-radius:50%;
-    box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3);
-    cursor:pointer;
-    transition: transform 0.1s;
-  }
-  .bubble.popped {
-    background:#c0c0c0;
-    transform: translateY(5px);
-  }
-  /* Zen Garden */
-  #zen {
-    border:2px solid #333;
-    border-radius:10px;
-    width:400px;
-    height:300px;
-    cursor:crosshair;
-  }
-  /* Fidget Spinner */
-  .spinner-container {
-    position:relative;
-    width:200px;
-    height:200px;
-  }
-  .spinner {
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    background:#ff4081;
-    position:absolute;
-    top:0;
-    left:0;
-    transform-origin:center;
-    transition: transform 0.05s linear;
-    box-shadow: 0 0 20px #ff4081;
-  }
-  /* Pop-it */
-  .popit {
-    display:grid;
-    grid-template-columns: repeat(6,50px);
-    grid-gap:5px;
-  }
-  .popit-bubble {
-    width:50px;
-    height:50px;
-    background:#ffeb3b;
-    border-radius:50%;
-    box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3);
-    cursor:pointer;
-    transition: transform 0.1s;
-  }
-  .popit-bubble.popped {
-    transform: translateY(5px);
-    background:#fbc02d;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e0f7fa;
+  overflow-x: hidden;
+}
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: #006064;
+}
+.section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+  margin: 40px 0;
+}
+
+/* Bubble Wrap */
+.bubble-wrap {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  grid-gap: 5px;
+}
+.bubble {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ccefff, #66bbff);
+  box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.bubble.popped {
+  transform: translateY(5px);
+  background: radial-gradient(circle at 30% 30%, #bbbbbb, #888888);
+}
+
+/* Pop-it */
+.popit {
+  display: grid;
+  grid-template-columns: repeat(6, 60px);
+  grid-gap: 5px;
+}
+.popit-bubble {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffeb3b, #fbc02d);
+  box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.popit-bubble.popped {
+  transform: translateY(5px);
+  background: radial-gradient(circle at 30% 30%, #fbc02d, #f57f17);
+}
+
+/* Zen Garden */
+#zen {
+  border: 3px solid #8d6e63;
+  border-radius: 15px;
+  width: 400px;
+  height: 300px;
+  cursor: crosshair;
+  background: #f5deb3;
+}
+
+/* Fidget Spinner */
+.spinner-container {
+  width: 200px;
+  height: 200px;
+  perspective: 500px;
+}
+.spinner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #ff4081;
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: grab;
+  box-shadow: 0 0 20px #ff4081;
+}
+.spinner:active {
+  cursor: grabbing;
+}
+
+/* Rubik's Cube */
+#rubik {
+  width: 200px;
+  height: 200px;
+  perspective: 600px;
+}
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(-30deg);
+  cursor: grab;
+}
+.cube-face {
+  position: absolute;
+  width: 66px;
+  height: 66px;
+  background: #fff;
+  border: 2px solid #000;
+  display: flex;
+  flex-wrap: wrap;
+}
+.sticker {
+  width: 20px;
+  height: 20px;
+  margin: 1px;
+  box-sizing: border-box;
+}
+.face-0 { transform: rotateY(0deg) translateZ(100px); }
+.face-1 { transform: rotateY(90deg) translateZ(100px); }
+.face-2 { transform: rotateY(180deg) translateZ(100px); }
+.face-3 { transform: rotateY(-90deg) translateZ(100px); }
+.face-4 { transform: rotateX(90deg) translateZ(100px); }
+.face-5 { transform: rotateX(-90deg) translateZ(100px); }
 </style>
 </head>
 <body>
-<h1>Ultimate Stress Reliever Playground</h1>
+<h1>Ultimate Realistic Stress Playground</h1>
 
-<!-- Bubble Wrap -->
+<!-- Bubble Wrap & Pop-it -->
 <div class="section">
   <div>
     <h2 style="text-align:center;">Bubble Wrap 🫧</h2>
     <div class="bubble-wrap" id="bubbleWrap"></div>
   </div>
 
+  <div>
+    <h2 style="text-align:center;">Pop-it Board</h2>
+    <div class="popit" id="popit"></div>
+  </div>
+</div>
+
 <!-- Zen Garden -->
+<div class="section">
   <div>
     <h2 style="text-align:center;">Zen Garden 🪷</h2>
     <canvas id="zen"></canvas>
   </div>
 </div>
 
-<!-- Fidget Spinner -->
+<!-- Fidget Spinner & Rubik's Cube -->
 <div class="section">
   <div>
     <h2 style="text-align:center;">Fidget Spinner 🌀</h2>
@@ -115,74 +164,118 @@
     </div>
   </div>
 
-<!-- Pop-it -->
   <div>
-    <h2 style="text-align:center;">Pop-it Board</h2>
-    <div class="popit" id="popit"></div>
+    <h2 style="text-align:center;">Rubik's Cube 🟥🟩🟦</h2>
+    <div id="rubik">
+      <div class="cube" id="cube"></div>
+    </div>
   </div>
 </div>
 
 <script>
-// ================== Bubble Wrap ==================
+// ===== Bubble Wrap =====
 const bubbleWrap = document.getElementById("bubbleWrap");
 for(let i=0;i<50;i++){
-  const b = document.createElement("div");
+  const b=document.createElement("div");
   b.classList.add("bubble");
-  b.addEventListener('click',()=>{
+  b.addEventListener("click",()=>{
     if(!b.classList.contains("popped")){
       b.classList.add("popped");
-      new Audio('https://www.soundjay.com/button/sounds/button-16.mp3').play();
+      new Audio("https://www.soundjay.com/button/sounds/button-16.mp3").play();
     }
   });
   bubbleWrap.appendChild(b);
 }
 
-// ================== Zen Garden ==================
-const canvas = document.getElementById("zen");
-const ctx = canvas.getContext("2d");
-let isRaking = false;
-let lastPos = {x:0,y:0};
-canvas.addEventListener('mousedown', e => {
-  isRaking = true;
-  lastPos = {x:e.offsetX, y:e.offsetY};
+// ===== Pop-it =====
+const popit=document.getElementById("popit");
+for(let i=0;i<36;i++){
+  const b=document.createElement("div");
+  b.classList.add("popit-bubble");
+  b.addEventListener("click",()=>{
+    b.classList.toggle("popped");
+    new Audio("https://www.soundjay.com/button/sounds/button-16.mp3").play();
+  });
+  popit.appendChild(b);
+}
+
+// ===== Zen Garden =====
+const canvas=document.getElementById("zen");
+const ctx=canvas.getContext("2d");
+canvas.width=canvas.offsetWidth;
+canvas.height=canvas.offsetHeight;
+let isRaking=false;
+let lastPos={x:0,y:0};
+canvas.addEventListener("mousedown",e=>{
+  isRaking=true;
+  lastPos={x:e.offsetX,y:e.offsetY};
 });
-canvas.addEventListener('mouseup', e => isRaking=false);
-canvas.addEventListener('mousemove', e => {
-  if(!isRaking) return;
-  ctx.strokeStyle = "#8B4513";
-  ctx.lineWidth = 2;
+canvas.addEventListener("mouseup",()=>isRaking=false);
+canvas.addEventListener("mousemove",e=>{
+  if(!isRaking)return;
+  ctx.strokeStyle="#8B4513";
+  ctx.lineWidth=2;
   ctx.beginPath();
   ctx.moveTo(lastPos.x,lastPos.y);
   ctx.lineTo(e.offsetX,e.offsetY);
   ctx.stroke();
-  lastPos = {x:e.offsetX, y:e.offsetY};
+  lastPos={x:e.offsetX,y:e.offsetY};
 });
-ctx.fillStyle = "#f5deb3";
+ctx.fillStyle="#f5deb3";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 
-// ================== Fidget Spinner ==================
-const spinner = document.getElementById("spinner");
-let angle = 0;
-let spinning = false;
-spinner.addEventListener('mousedown', () => spinning = true);
-document.addEventListener('mouseup', () => spinning = false);
-document.addEventListener('mousemove', e => {
+// ===== Fidget Spinner =====
+const spinner=document.getElementById("spinner");
+let spinning=false;
+let angle=0;
+let velocity=0;
+spinner.addEventListener("mousedown",()=>spinning=true);
+document.addEventListener("mouseup",()=>spinning=false);
+document.addEventListener("mousemove",e=>{
   if(spinning){
-    angle += 20;
-    spinner.style.transform = `rotate(${angle}deg)`;
+    velocity+=5;
   }
 });
+function spin(){
+  angle+=velocity;
+  spinner.style.transform=`rotate(${angle}deg)`;
+  velocity*=0.95; // friction
+  requestAnimationFrame(spin);
+}
+spin();
 
-// ================== Pop-it Board ==================
-const popit = document.getElementById("popit");
-for(let i=0;i<36;i++){
-  const b = document.createElement("div");
-  b.classList.add("popit-bubble");
-  b.addEventListener('click',()=>{
-    b.classList.toggle("popped");
-    new Audio('https://www.soundjay.com/button/sounds/button-16.mp3').play();
-  });
-  popit.appendChild(b);
+// ===== Rubik's Cube =====
+const cube=document.getElementById("cube");
+let cubeX=-30,cubeY=-30;
+let dragging=false;
+let start={x:0,y:0};
+cube.addEventListener("mousedown",e=>{
+  dragging=true;
+  start={x:e.clientX,y:e.clientY};
+});
+document.addEventListener("mouseup",()=>dragging=false);
+document.addEventListener("mousemove",e=>{
+  if(!dragging)return;
+  const dx=e.clientX-start.x;
+  const dy=e.clientY-start.y;
+  cubeY+=dx*0.5;
+  cubeX-=dy*0.5;
+  cube.style.transform=`rotateX(${cubeX}deg) rotateY(${cubeY}deg)`;
+  start={x:e.clientX,y:e.clientY};
+});
+
+// Add stickers
+const colors=["red","green","blue","yellow","orange","white"];
+for(let f=0;f<6;f++){
+  const face=document.createElement("div");
+  face.classList.add("cube-face","face-"+f);
+  for(let i=0;i<9;i++){
+    const sticker=document.createElement("div");
+    sticker.classList.add("sticker");
+    sticker.style.background=colors[f];
+    face.appendChild(sticker);
+  }
+  cube.appendChild(face);
 }
 </script>
 </body>
