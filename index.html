@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stress Reliever Playground</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    overflow-x: hidden;
+  }
+  h1 {
+    text-align: center;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    margin-top: 20px;
+  }
+  .section {
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+  button, .color-box, .draggable {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    border-radius: 10px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  button:hover {
+    transform: scale(1.2);
+  }
+  .color-box {
+    width: 100px;
+    height: 100px;
+    border: 3px solid #fff;
+  }
+  .draggable {
+    width: 80px;
+    height: 80px;
+    background-color: #00f;
+    position: absolute;
+    top: 400px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+  }
+  canvas {
+    border: 3px solid #fff;
+    border-radius: 15px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Stress Reliever Playground</h1>
+
+<!-- Button Click Fun -->
+<div class="section">
+  <button onclick="changeBackground()">🌈 Change Background!</button>
+  <button onclick="playSound()">🔊 Play Sound</button>
+  <button onclick="alert('You clicked me! 🎉')">Click Me!</button>
+</div>
+
+<!-- Color Changer -->
+<div class="section">
+  <div class="color-box" onclick="changeColor(this)"></div>
+  <div class="color-box" onclick="changeColor(this)"></div>
+  <div class="color-box" onclick="changeColor(this)"></div>
+</div>
+
+<!-- Mini Canvas Game -->
+<div class="section">
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+</div>
+
+<!-- Draggable Object -->
+<div class="draggable" id="dragMe"></div>
+
+<script>
+// Background changer
+function changeBackground() {
+  const colors = ['#ff9a9e', '#a18cd1', '#fbc2eb', '#fad0c4', '#ffecd2', '#cfd9df'];
+  document.body.style.background = `linear-gradient(135deg, ${colors[Math.floor(Math.random()*colors.length)]}, ${colors[Math.floor(Math.random()*colors.length)]})`;
+}
+
+// Sound effect
+function playSound() {
+  const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
+  audio.play();
+}
+
+// Color box changer
+function changeColor(box) {
+  const colors = ['red','blue','yellow','green','orange','purple','#ff69b4'];
+  box.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+}
+
+// Draggable object
+const dragItem = document.getElementById("dragMe");
+let isDragging = false;
+let offsetX, offsetY;
+
+dragItem.addEventListener('mousedown', e => {
+  isDragging = true;
+  offsetX = e.offsetX;
+  offsetY = e.offsetY;
+});
+document.addEventListener('mousemove', e => {
+  if(isDragging){
+    dragItem.style.left = (e.pageX - offsetX) + 'px';
+    dragItem.style.top = (e.pageY - offsetY) + 'px';
+  }
+});
+document.addEventListener('mouseup', () => isDragging = false);
+
+// Mini game: bouncing ball
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let ball = {x:200, y:200, dx:3, dy:3, radius:20, color:'#fff'};
+function drawBall(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+  ctx.fillStyle = ball.color;
+  ctx.fill();
+  ctx.closePath();
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+  if(ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.dx *= -1;
+  if(ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) ball.dy *= -1;
+  requestAnimationFrame(drawBall);
+}
+drawBall();
+</script>
+
+</body>
+</html>
