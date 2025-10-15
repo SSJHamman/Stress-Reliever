@@ -1,67 +1,387 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Stress Relief Playground</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Realistic Interactive Fidgets</title>
   <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
+    :root{
+      --bg: #f2f4f7;
+      --card: #ffffff;
+      --muted: #7b8390;
+      --accent: linear-gradient(135deg,#7dd3fc,#60a5fa);
+      --glass: rgba(255,255,255,0.6);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0; background:var(--bg); color:#0f172a; -webkit-font-smoothing:antialiased;
+      display:flex; align-items:flex-start; justify-content:center; padding:36px;
+    }
+    .wrap{
+      width:1100px; max-width:95%; display:grid; grid-template-columns: 1fr 420px; gap:20px;
+    }
+
+    header{grid-column:1/-1; margin-bottom:6px}
+    h1{margin:0 0 6px 0; font-size:20px}
+    p.lead{margin:0; color:var(--muted); font-size:13px}
+
+    .panel{
+      background:var(--card); border-radius:14px; box-shadow: 0 6px 20px rgba(14, 23, 39, 0.08); padding:18px;
+    }
+
+    /* Left: big playground */
+    .play{
+      min-height:640px; display:flex; flex-direction:column; gap:14px;
+    }
+
+    .scene{
+      background: linear-gradient(180deg,#eef3fb 0%, #ffffff 100%);
+      border-radius:12px; padding:18px; display:flex; gap:18px; align-items:flex-start; justify-content:center; flex-wrap:wrap;
+      box-shadow: inset 0 2px 8px rgba(10,20,40,0.02);
+    }
+
+    /* Bubble wrap */
+    .bubble-wrap{
+      width:520px; height:360px; background: radial-gradient( circle at 20% 20%, rgba(255,255,255,0.9), rgba(255,255,255,0.6) 15%, rgba(244,246,250,1) 60% );
+      border-radius:12px; padding:12px; box-sizing:border-box; display:grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 1fr; gap:8px; position:relative;
+    }
+    .bubble{
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(245,248,255,0.7) 35%, rgba(210,227,255,0.35) 70%);
+      box-shadow: 0 6px 14px rgba(12, 22, 42, 0.12), inset 0 -8px 18px rgba(255,255,255,0.6);
+      border-radius:50%; aspect-ratio:1/1; display:block; width:100%; height:100%; position:relative; transform-origin:center; cursor:pointer; transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 120ms;
+      border:1px solid rgba(0,0,0,0.04);
+    }
+    .bubble:after{ content:''; position:absolute; inset:0; border-radius:50%; }
+    .bubble.popped{
+      transform: translateY(6px) scale(0.9); opacity:0.6; box-shadow: 0 2px 6px rgba(12, 22, 42, 0.08) inset;
+      transition: transform 220ms cubic-bezier(.2,0.8,.2,1), opacity 300ms;
+    }
+
+    /* Fidget spinner */
+    .spinner-wrap{ width:320px; height:320px; display:flex; align-items:center; justify-content:center; }
+    .spinner{
+      width:220px; height:220px; border-radius:50%; position:relative; background: radial-gradient(circle at 30% 30%, #f8fafc, #e6eefb 50%);
+      box-shadow: 0 12px 30px rgba(12,18,30,0.12), inset 0 -8px 18px rgba(255,255,255,0.5);
+      display:flex; align-items:center; justify-content:center; user-select:none; touch-action: none; cursor:grab;
+    }
+    .spinner:active{ cursor:grabbing }
+    .spinner .center{
+      width:54px; height:54px; background:linear-gradient(180deg,#111827,#1f2937); border-radius:50%; box-shadow: 0 6px 18px rgba(12,18,30,0.4), inset 0 -8px 14px rgba(255,255,255,0.06);
+      display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:12px;
+    }
+    .spinner .arm{
+      position:absolute; width:90px; height:54px; left:50%; top:50%; transform-origin:0 50%; margin-left:8px; display:flex; align-items:center; justify-content:flex-start;
+    }
+    .arm .pad{
+      width:48px;height:48px;border-radius:50%; background: linear-gradient(180deg,#f8fafc,#e6eefb); box-shadow: 0 8px 18px rgba(12,18,30,0.12), inset 0 -6px 12px rgba(255,255,255,0.8);
+      border:1px solid rgba(0,0,0,0.06);
+      display:flex; align-items:center; justify-content:center; font-size:10px; color:#334155;
+    }
+
+    /* Right column controls */
+    .sidebar{ display:flex; flex-direction:column; gap:12px }
+    .control { padding:12px; border-radius:10px; background:linear-gradient(180deg,#ffffff,#fbfdff); box-shadow: 0 6px 18px rgba(12,18,30,0.04);}
+    .label{font-size:12px; color:var(--muted); margin-bottom:8px}
+    .row{display:flex; gap:8px; align-items:center}
+    .btn{padding:8px 12px; border-radius:8px; background:var(--accent); color:white; font-weight:600; border:none; cursor:pointer}
+    .small{font-size:12px; padding:6px 8px}
+
+    footer{grid-column:1/-1; margin-top:6px; color:var(--muted); font-size:13px}
+
+    /* small fidgets */
+    .mini-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px }
+    .mini{ height:110px; border-radius:10px; display:flex; align-items:center; justify-content:center; position:relative }
+    .clicker{ background: linear-gradient(180deg,#fff,#f3f7ff); box-shadow: 0 6px 14px rgba(12,18,30,0.06);}
+    .slider{ background: linear-gradient(180deg,#fff,#fffaf0);}
+    .switch{ background: linear-gradient(180deg,#fff,#f8fff6);}
+
+    /* clicker/button */
+    .btn-click{ width:70px; height:70px; border-radius:50%; border:none; box-shadow: 0 20px 30px rgba(50,60,90,0.12); background: linear-gradient(180deg,#fefefe,#f2f5ff); font-weight:700; cursor:pointer }
+
+    /* slider */
+    .track{ width:90%; height:12px; background:linear-gradient(180deg,#e6e9ee,#ffffff); border-radius:10px; box-shadow: inset 0 -4px 8px rgba(0,0,0,0.04); display:flex; align-items:center; padding:4px }
+    .knob{ width:28px; height:28px; border-radius:50%; background: linear-gradient(180deg,#ffffff,#e6eefb); box-shadow: 0 8px 18px rgba(12,18,30,0.12); cursor:pointer }
+
+    /* tiny instructions */
+    .hint{ font-size:12px; color:var(--muted) }
+
+    @media (max-width:980px){ .wrap{ grid-template-columns: 1fr; } .spinner-wrap{ order:2 } }
   </style>
 </head>
 <body>
-  <canvas id="webgl-canvas"></canvas>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <div class="wrap">
+    <header>
+      <h1>Realistic Interactive Fidgets</h1>
+      <p class="lead">Bubble wrap, spinner, clickers and a set of tactile fidgets — click, drag or flick to play. Built as a single HTML file.</p>
+    </header>
+
+    <div class="panel play">
+      <div class="scene">
+        <div id="bubbleWrap" class="bubble-wrap" aria-label="Bubble wrap">
+          <!-- bubbles generated by script -->
+        </div>
+
+        <div class="spinner-wrap">
+          <div id="spinner" class="spinner" role="img" aria-label="Fidget spinner">
+            <div class="arm" style="transform: rotate(0deg)"><div class="pad">A</div></div>
+            <div class="arm" style="transform: rotate(120deg)"><div class="pad">B</div></div>
+            <div class="arm" style="transform: rotate(240deg)"><div class="pad">C</div></div>
+            <div class="center">Fidget</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:14px;">
+        <div class="mini-grid panel" style="flex:1">
+          <div class="mini clicker">
+            <button id="clickerBtn" class="btn-click" title="Click fast">Click</button>
+          </div>
+          <div class="mini slider">
+            <div style="width:90%;">
+              <div class="track" id="track">
+                <div class="knob" id="knob" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="hint" style="text-align:center;margin-top:8px">Drag the knob</div>
+            </div>
+          </div>
+
+          <div class="mini switch">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+              <div class="label">Seesaw</div>
+              <div style="width:90%;height:40px;display:flex;align-items:center;justify-content:center">
+                <div id="seesaw" style="width:90%;height:12px;border-radius:10px;background:linear-gradient(180deg,#e6e9ee,#ffffff);position:relative">
+                  <div id="tilt" style="position:absolute;left:50%;transform:translateX(-50%);top:-18px;width:120px;height:36px;border-radius:8px;background:linear-gradient(180deg,#fff,#f6faff);box-shadow: 0 8px 16px rgba(10,20,40,0.08);display:flex;align-items:center;justify-content:center">Tilt me</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini clicker">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+              <div class="label">Pop counter</div>
+              <div style="font-weight:700;font-size:18px;color:#0f172a" id="popCount">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel sidebar" style="width:380px">
+          <div class="control">
+            <div class="label">Bubble wrap</div>
+            <div class="row">
+              <button id="resetBubbles" class="btn small">Reset</button>
+              <div style="flex:1"></div>
+              <div class="hint">Click or touch bubbles to pop them. Hold Shift to pop a 3x3 area.</div>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="label">Spinner</div>
+            <div class="row">
+              <button id="spinBtn" class="btn small">Flick</button>
+              <button id="stopBtn" class="btn small" style="background:linear-gradient(180deg,#fda4af,#fb7185)">Stop</button>
+            </div>
+            <div class="hint" style="margin-top:8px">Drag and release the spinner to give it angular velocity. Try quick flicks for big spins.</div>
+          </div>
+
+          <div class="control">
+            <div class="label">Sounds & settings</div>
+            <div style="display:flex; gap:8px; align-items:center">
+              <label style="display:flex;align-items:center;gap:8px"><input id="soundToggle" type="checkbox" checked> Sound</label>
+              <label style="display:flex;align-items:center;gap:8px;margin-left:auto">Sensitivity <input id="sensitivity" type="range" min="0.4" max="2" step="0.1" value="1"></label>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="label">About</div>
+            <div class="hint">This is a single-file demo that uses WebAudio + CSS + canvas-free rendering for tactile interactions.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="panel">Tip: For best tactile feel, use a touch screen or trackpad. Want more fidgets or a different style? Tell me what to add.</footer>
+  </div>
+
   <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas') });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    // Utilities: WebAudio short pop and click
+    const audioCtx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
+    let soundEnabled = true;
+    document.getElementById('soundToggle').addEventListener('change',(e)=>{ soundEnabled = e.target.checked; });
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 2);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 5, 5).normalize();
-    scene.add(directionalLight);
-
-    // Fidget Spinner
-    const spinnerGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 32);
-    const spinnerMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, metalness: 0.8, roughness: 0.2 });
-    const spinner = new THREE.Mesh(spinnerGeometry, spinnerMaterial);
-    scene.add(spinner);
-
-    // Bearings
-    const bearingGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.02, 32);
-    const bearingMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.9, roughness: 0.1 });
-    const bearing = new THREE.Mesh(bearingGeometry, bearingMaterial);
-    bearing.position.set(0, 0, 0.03);
-    spinner.add(bearing);
-
-    // Zen Garden
-    const sandGeometry = new THREE.PlaneGeometry(10, 10);
-    const sandMaterial = new THREE.MeshStandardMaterial({ color: 0xf4a300, roughness: 0.8 });
-    const sand = new THREE.Mesh(sandGeometry, sandMaterial);
-    sand.rotation.x = -Math.PI / 2;
-    scene.add(sand);
-
-    // Bubble Wrap
-    const bubbleGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-    const bubbleMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, transparent: true, opacity: 0.8 });
-    const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
-    scene.add(bubble);
-
-    // Camera Position
-    camera.position.z = 5;
-
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-      spinner.rotation.z += 0.01;
-      renderer.render(scene, camera);
+    function playPop(volume=0.6, frequency=1000){
+      if(!audioCtx || !soundEnabled) return;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'triangle'; o.frequency.value = frequency;
+      g.gain.value = volume;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+      o.stop(audioCtx.currentTime + 0.09);
     }
-    animate();
+    function playClick(volume=0.5){ playPop(volume, 800); }
+
+    // BUBBLE WRAP
+    const bubbleWrap = document.getElementById('bubbleWrap');
+    const resetBtn = document.getElementById('resetBubbles');
+    const popCountEl = document.getElementById('popCount');
+    let POP_COUNT = 0;
+
+    function makeBubbles(cols=12, rows=8){
+      bubbleWrap.innerHTML='';
+      bubbleWrap.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          const b = document.createElement('button');
+          b.className='bubble';
+          b.dataset.r = r; b.dataset.c = c;
+          b.setAttribute('aria-pressed','false');
+          bubbleWrap.appendChild(b);
+        }
+      }
+    }
+
+    function popBubble(el, area=0){
+      if(!el || el.classList.contains('popped')) return;
+      el.classList.add('popped');
+      el.setAttribute('aria-pressed','true');
+      // small tactile animation: tiny scale then settle
+      el.animate([
+        { transform: 'translateY(0) scale(1)' },
+        { transform: 'translateY(8px) scale(0.9)' },
+        { transform: 'translateY(6px) scale(0.92)' }
+      ], { duration: 220, easing: 'cubic-bezier(.2,.9,.2,1)' });
+      POP_COUNT++; popCountEl.textContent = POP_COUNT;
+      playPop(0.5 + Math.random()*0.4, 800 + Math.random()*600);
+
+      // optional ripple: small shadow pulse
+      const pulse = document.createElement('div'); pulse.style.position='absolute';
+      pulse.style.width='8px'; pulse.style.height='8px'; pulse.style.left='50%'; pulse.style.top='50%';
+      bubbleWrap.appendChild(pulse);
+      setTimeout(()=>pulse.remove(),400);
+
+      if(area>0){
+        // pop neighbors for small area
+        const r = parseInt(el.dataset.r), c = parseInt(el.dataset.c);
+        for(let dr=-area;dr<=area;dr++)for(let dc=-area;dc<=area;dc++){
+          const sel = `[data-r='${r+dr}'][data-c='${c+dc}']`;
+          const neighbor = bubbleWrap.querySelector(sel);
+          if(neighbor && !neighbor.classList.contains('popped')){
+            setTimeout(()=>popBubble(neighbor,0), 40 + Math.random()*80);
+          }
+        }
+      }
+    }
+
+    // pointer handling for bubble wrap
+    let pointerDown = false;
+    bubbleWrap.addEventListener('pointerdown', (e)=>{
+      e.preventDefault();
+      pointerDown = true; bubbleWrap.setPointerCapture(e.pointerId);
+      const target = e.target.closest('.bubble');
+      if(target) popBubble(target, e.shiftKey ? 1 : 0);
+    });
+    bubbleWrap.addEventListener('pointermove', (e)=>{
+      if(!pointerDown) return;
+      const target = document.elementFromPoint(e.clientX, e.clientY);
+      const b = target && target.closest('.bubble');
+      if(b) popBubble(b, e.shiftKey ? 1 : 0);
+    });
+    document.addEventListener('pointerup', (e)=>{ pointerDown=false; });
+
+    resetBtn.addEventListener('click', ()=>{ makeBubbles(); POP_COUNT=0; popCountEl.textContent=0; });
+
+    // init
+    makeBubbles(12,8);
+
+    // SPINNER: physics-like angular velocity
+    const spinner = document.getElementById('spinner');
+    let ang = 0, vel = 0, friction = 0.9955; // friction applied each frame
+    let lastTime = null; let spinning = false;
+
+    function renderSpinner(t){
+      if(!lastTime) lastTime=t;
+      const dt = (t-lastTime)/1000; lastTime = t;
+      if(Math.abs(vel) > 0.0005){
+        ang += vel * dt * 360; // deg per second scaled
+        vel *= Math.pow(friction, dt*60);
+      } else {
+        vel = 0;
+      }
+      spinner.style.transform = `rotate(${ang}deg)`;
+      requestAnimationFrame(renderSpinner);
+    }
+    requestAnimationFrame(renderSpinner);
+
+    // pointer flick to set velocity
+    let isDown = false; let startAngle=0; let startTime=0; let startX=0, startY=0;
+    spinner.addEventListener('pointerdown', (e)=>{
+      spinner.setPointerCapture(e.pointerId); isDown=true; startX=e.clientX; startY=e.clientY; startTime=performance.now(); startAngle = ang;
+    });
+    spinner.addEventListener('pointerup', (e)=>{
+      if(!isDown) return; isDown=false; spinner.releasePointerCapture(e.pointerId);
+      const dx = e.clientX - startX, dy = e.clientY - startY; const dt = (performance.now()-startTime)/1000;
+      // estimate tangential velocity relative to center
+      const rect = spinner.getBoundingClientRect(); const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+      const v1 = Math.atan2(startY-cy, startX-cx); const v2 = Math.atan2(e.clientY-cy, e.clientX-cx);
+      let delta = (v2 - v1); // radians
+      // normalize between -PI and PI
+      while(delta > Math.PI) delta -= Math.PI*2; while(delta < -Math.PI) delta += Math.PI*2;
+      // angular speed (rev/s) approx
+      const angVel = delta / dt; // rad/s
+      // convert to deg/s and scale
+      vel += (angVel * (180/Math.PI)) * 0.05 * Number(document.getElementById('sensitivity').value);
+      playClick(0.6);
+    });
+
+    // programmatic flick
+    document.getElementById('spinBtn').addEventListener('click', ()=>{ vel += 1200 * (Number(document.getElementById('sensitivity').value)||1); playClick(0.6); });
+    document.getElementById('stopBtn').addEventListener('click', ()=>{ vel = 0; });
+
+    // knob slider
+    const track = document.getElementById('track'); const knob = document.getElementById('knob');
+    let dragging = false; function setKnobFromClientX(x){
+      const r = track.getBoundingClientRect(); let p = (x - r.left) / r.width; p = Math.max(0,Math.min(1,p)); knob.style.transform = `translateX(${(p* (r.width - knob.offsetWidth))}px)`;
+    }
+    knob.addEventListener('pointerdown',(e)=>{ dragging=true; knob.setPointerCapture(e.pointerId); });
+    document.addEventListener('pointermove',(e)=>{ if(!dragging) return; setKnobFromClientX(e.clientX); });
+    document.addEventListener('pointerup',(e)=>{ if(dragging){ dragging=false; knob.releasePointerCapture(e.pointerId); playClick(0.35); } });
+
+    // clicker button
+    const clickerBtn = document.getElementById('clickerBtn'); let lastClick=0; clickerBtn.addEventListener('pointerdown',(e)=>{ const now = performance.now(); if(now - lastClick < 120) playClick(0.7); else playClick(0.5); lastClick=now; clickerBtn.animate([{transform:'scale(1)'},{transform:'scale(0.92)'},{transform:'scale(1)'}],{duration:160}); });
+
+    // seesaw tilt — make draggable horizontally
+    const tilt = document.getElementById('tilt'); let tiltDrag=false; tilt.addEventListener('pointerdown',(e)=>{ tiltDrag=true; tilt.setPointerCapture(e.pointerId); });
+    document.addEventListener('pointermove',(e)=>{ if(!tiltDrag) return; const rect = document.getElementById('seesaw').getBoundingClientRect(); const cx = (e.clientX - rect.left) / rect.width; const angle = (cx - 0.5) * 30; tilt.style.transform = `translateX(-50%) rotate(${angle}deg)`; });
+    document.addEventListener('pointerup',(e)=>{ if(tiltDrag){ tiltDrag=false; tilt.releasePointerCapture(e.pointerId); tilt.style.transform = 'translateX(-50%) rotate(0deg)'; playClick(0.4); } });
+
+    // sensitivity control
+    document.getElementById('sensitivity').addEventListener('input',(e)=>{ /* live update handled by reading value where needed */ });
+
+    // small accessibility: keyboard reset
+    document.addEventListener('keydown',(e)=>{ if(e.key==='r') resetBtn.click(); if(e.key===' '){ clickerBtn.click(); e.preventDefault(); } });
+
+    // pop counter: already updated by popBubble
+
+    // small performance: allow double-click to clear one popped bubble (unpop)
+    bubbleWrap.addEventListener('dblclick', (e)=>{
+      const b = e.target.closest('.bubble'); if(!b) return; if(b.classList.contains('popped')){ b.classList.remove('popped'); POP_COUNT = Math.max(0, POP_COUNT-1); popCountEl.textContent = POP_COUNT; }
+    });
+
+    // optional: continuous gentle breathing animation for bubbles to look realistic
+    function subtleBreath(){
+      const bubbles = Array.from(bubbleWrap.children);
+      bubbles.forEach((b,i)=>{
+        const s = 1 + Math.sin((performance.now()/1200) + i)*0.007;
+        b.style.transform = b.classList.contains('popped') ? 'translateY(6px) scale(0.92)' : `scale(${s})`;
+      });
+      requestAnimationFrame(subtleBreath);
+    }
+    requestAnimationFrame(subtleBreath);
+
   </script>
 </body>
 </html>
