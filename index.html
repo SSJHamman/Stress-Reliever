@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smooth Interactive Fidgets</title>
+<title>Calming Interactive Fidgets</title>
 <style>
   body {
     margin: 0;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    background: linear-gradient(135deg, #1c1c1c, #2c3e50, #34495e);
     font-family: 'Segoe UI', sans-serif;
     color: #fff;
     display: flex;
@@ -30,10 +30,10 @@
   }
   .panel {
     background: rgba(255,255,255,0.05);
-    border-radius: 30px;
+    border-radius: 40px;
     padding: 20px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 6px 25px rgba(0,0,0,0.5);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,7 +61,7 @@
 </style>
 </head>
 <body>
-<h1>Smooth Interactive Fidgets</h1>
+<h1>Calming Interactive Fidgets</h1>
 <div class="fidgets">
   <div class="panel">
     <h2>Bubble Wrap</h2>
@@ -91,6 +91,18 @@
   <div class="panel">
     <h2>Color Ripple Touch</h2>
     <canvas id="ripple" width="250" height="250"></canvas>
+  </div>
+  <div class="panel">
+    <h2>Floating Orbs</h2>
+    <canvas id="floating" width="250" height="250"></canvas>
+  </div>
+  <div class="panel">
+    <h2>Calm Liquid Ripples</h2>
+    <canvas id="liquid" width="250" height="250"></canvas>
+  </div>
+  <div class="panel">
+    <h2>Soothing Particle Flow</h2>
+    <canvas id="particles" width="250" height="250"></canvas>
   </div>
 </div>
 <script>
@@ -182,166 +194,72 @@ window.addEventListener('mousemove',e=>{
 });
 drawSpinner();
 
-// Color Orbit
-const orbitCanvas=document.getElementById('orbit');
-const oCtx=orbitCanvas.getContext('2d');
-let particles=[];
-for(let i=0;i<10;i++){
-  particles.push({angle:Math.random()*Math.PI*2,radius:30+Math.random()*70,color:`hsl(${Math.random()*360},80%,60%)`,speed:0.01+Math.random()*0.02});
-}
-function drawOrbit(){
-  oCtx.clearRect(0,0,orbitCanvas.width,orbitCanvas.height);
-  const cx=125,cy=125;
-  for(let p of particles){
-    p.angle+=p.speed;
-    const x=cx+Math.cos(p.angle)*p.radius;
-    const y=cy+Math.sin(p.angle)*p.radius;
-    oCtx.beginPath();
-    oCtx.arc(x,y,12,0,Math.PI*2);
-    oCtx.fillStyle=p.color;
-    oCtx.fill();
+// Floating Orbs
+const floatCanvas=document.getElementById('floating');
+const fCtx=floatCanvas.getContext('2d');
+let orbs=[];
+for(let i=0;i<12;i++) orbs.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,r:8+Math.random()*6});
+function drawFloating(){
+  fCtx.clearRect(0,0,floatCanvas.width,floatCanvas.height);
+  for(let o of orbs){
+    o.x+=o.dx; o.y+=o.dy;
+    if(o.x<0||o.x>250)o.dx*=-1;
+    if(o.y<0||o.y>250)o.dy*=-1;
+    fCtx.beginPath();
+    fCtx.arc(o.x,o.y,o.r,0,Math.PI*2);
+    fCtx.fillStyle='rgba(0,200,255,0.4)';
+    fCtx.fill();
   }
-  requestAnimationFrame(drawOrbit);
+  requestAnimationFrame(drawFloating);
 }
-drawOrbit();
+drawFloating();
 
-// Magnetic Dots
-const magCanvas=document.getElementById('magnetic');
-const mCtx=magCanvas.getContext('2d');
-let dots=[];
-for(let i=0;i<8;i++){
-  dots.push({x:Math.random()*200+25,y:Math.random()*200+25,dx:0,dy:0});
-}
-let selectedDot=null;
-magCanvas.addEventListener('mousedown',e=>{
-  const rect=magCanvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left;
-  const my=e.clientY-rect.top;
-  for(let d of dots){
-    if(Math.hypot(mx-d.x,my-d.y)<15) selectedDot=d;
-  }
-});
-window.addEventListener('mouseup',()=>{selectedDot=null;});
-window.addEventListener('mousemove',e=>{
-  if(selectedDot){
-    const rect=magCanvas.getBoundingClientRect();
-    selectedDot.x=Math.min(Math.max(e.clientX-rect.left,15),235);
-    selectedDot.y=Math.min(Math.max(e.clientY-rect.top,15),235);
-  }
-});
-function drawMagnetic(){
-  mCtx.clearRect(0,0,magCanvas.width,magCanvas.height);
-  for(let d1 of dots){
-    for(let d2 of dots){
-      if(d1!==d2){
-        let dx=d1.x-d2.x,dy=d1.y-d2.y;
-        let dist=Math.hypot(dx,dy);
-        if(dist<100){
-          let force=(100-dist)/100*0.5;
-          d1.dx+=dx/dist*force;
-          d1.dy+=dy/dist*force;
-        }
-      }
-    }
-  }
-  for(let d of dots){
-    d.x+=d.dx;
-    d.y+=d.dy;
-    d.dx*=0.9;
-    d.dy*=0.9;
-    mCtx.beginPath();
-    mCtx.arc(d.x,d.y,12,0,Math.PI*2);
-    mCtx.fillStyle='#ff6';
-    mCtx.fill();
-  }
-  requestAnimationFrame(drawMagnetic);
-}
-drawMagnetic();
-
-// Elastic Slider
-const sliderCanvas=document.getElementById('slider');
-const sLCtx=sliderCanvas.getContext('2d');
-let sliderX=20, sliderTarget=20, sliderDragging=false;
-sliderCanvas.addEventListener('mousedown',e=>{
-  const rect=sliderCanvas.getBoundingClientRect();
+// Calm Liquid Ripples
+const liquidCanvas=document.getElementById('liquid');
+const lCtx=liquidCanvas.getContext('2d');
+let ripples2=[];
+liquidCanvas.addEventListener('mousedown',e=>{
+  const rect=liquidCanvas.getBoundingClientRect();
   const x=e.clientX-rect.left;
-  if(x>sliderX && x<sliderX+40) sliderDragging=true;
+  const y=e.clientY-rect.top;
+  ripples2.push({x,y,radius:0,alpha:1});
 });
-window.addEventListener('mouseup',()=>{sliderDragging=false;});
-window.addEventListener('mousemove',e=>{
-  if(sliderDragging){
-    const rect=sliderCanvas.getBoundingClientRect();
-    sliderTarget=Math.min(Math.max(e.clientX-rect.left-20,0),210);
-  }
-});
-function drawSlider(){
-  sLCtx.clearRect(0,0,sliderCanvas.width,sliderCanvas.height);
-  sliderX=lerp(sliderX,sliderTarget,0.2);
-  sLCtx.fillStyle='#0ff';
-  sLCtx.fillRect(sliderX,20,40,40);
-  sLCtx.strokeStyle='#08f';
-  sLCtx.lineWidth=3;
-  sLCtx.strokeRect(sliderX,20,40,40);
-  requestAnimationFrame(drawSlider);
-}
-drawSlider();
-
-// Soft Wave Fidget
-const waveCanvas=document.getElementById('wave');
-const wCtx=waveCanvas.getContext('2d');
-let points=[];
-for(let i=0;i<10;i++) points.push({x:i*25+12.5,y:125,vy:0});
-waveCanvas.addEventListener('mousedown',e=>{
-  const rect=waveCanvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left;
-  const my=e.clientY-rect.top;
-  for(let p of points){
-    if(Math.abs(mx-p.x)<12.5) p.vy=my-p.y;
-  }
-});
-function drawWave(){
-  wCtx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
-  wCtx.beginPath();
-  wCtx.moveTo(0,125);
-  for(let p of points){
-    p.vy+=-(p.y-125)*0.05;
-    p.vy*=0.9;
-    p.y+=p.vy;
-    wCtx.lineTo(p.x,p.y);
-  }
-  wCtx.strokeStyle='#0ff';
-  wCtx.lineWidth=3;
-  wCtx.stroke();
-  requestAnimationFrame(drawWave);
-}
-drawWave();
-
-// Color Ripple Touch
-const rippleCanvas=document.getElementById('ripple');
-const rCtx=rippleCanvas.getContext('2d');
-let ripples=[];
-rippleCanvas.addEventListener('mousedown',e=>{
-  const rect=rippleCanvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left;
-  const my=e.clientY-rect.top;
-  ripples.push({x:mx,y:my,radius:0,alpha:1,hue:Math.random()*360});
-});
-function drawRipple(){
-  rCtx.clearRect(0,0,rippleCanvas.width,rippleCanvas.height);
-  for(let i=ripples.length-1;i>=0;i--){
-    let r=ripples[i];
+function drawLiquid(){
+  lCtx.clearRect(0,0,liquidCanvas.width,liquidCanvas.height);
+  for(let i=ripples2.length-1;i>=0;i--){
+    let r=ripples2[i];
     r.radius+=2;
     r.alpha*=0.95;
-    rCtx.beginPath();
-    rCtx.arc(r.x,r.y,r.radius,0,Math.PI*2);
-    rCtx.strokeStyle=`hsla(${r.hue},80%,60%,${r.alpha})`;
-    rCtx.lineWidth=3;
-    rCtx.stroke();
-    if(r.alpha<0.05) ripples.splice(i,1);
+    lCtx.beginPath();
+    lCtx.arc(r.x,r.y,r.radius,0,Math.PI*2);
+    lCtx.strokeStyle=`rgba(0,180,255,${r.alpha})`;
+    lCtx.lineWidth=3;
+    lCtx.stroke();
+    if(r.alpha<0.05) ripples2.splice(i,1);
   }
-  requestAnimationFrame(drawRipple);
+  requestAnimationFrame(drawLiquid);
 }
-drawRipple();
+drawLiquid();
+
+// Soothing Particle Flow
+const particleCanvas=document.getElementById('particles');
+const pCtx=particleCanvas.getContext('2d');
+let particles=[];
+for(let i=0;i<50;i++) particles.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*1,dy:(Math.random()-0.5)*1,r:2+Math.random()*3});
+function drawParticles(){
+  pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height);
+  for(let p of particles){
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>250)p.dx*=-1;
+    if(p.y<0||p.y>250)p.dy*=-1;
+    pCtx.beginPath();
+    pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    pCtx.fillStyle='rgba(0,150,255,0.5)';
+    pCtx.fill();
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
 </script>
 </body>
 </html>
