@@ -1,245 +1,197 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Calm Interactive Fidgets</title>
-  <style>
-    :root {
-      --bg: #e7edf1;
-      --card: #ffffffcc;
-      --muted: #607080;
-      --accent: #86b9c8;
-      --shadow: rgba(0, 0, 0, 0.08);
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: linear-gradient(180deg, #dee8ec, #f3f7f8);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      color: #23323b;
-    }
-    .container {
-      width: 90%;
-      max-width: 1000px;
-      margin: 40px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    header {
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 26px;
-      color: #2a3a46;
-    }
-    header p {
-      margin-top: 4px;
-      color: var(--muted);
-    }
-    .panel {
-      background: var(--card);
-      border-radius: 14px;
-      box-shadow: 0 6px 18px var(--shadow);
-      padding: 20px;
-      backdrop-filter: blur(12px);
-    }
-    .fidgets {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      justify-items: center;
-    }
-    /* Bubble wrap */
-    .bubble-wrap {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 8px;
-      width: 100%;
-      max-width: 480px;
-      padding: 16px;
-      background: linear-gradient(145deg, #eff5f6, #f9fcfd);
-      border-radius: 12px;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-    .bubble {
-      background: radial-gradient(circle at 30% 30%, #ffffff, #bcd4db 70%);
-      border-radius: 50%;
-      aspect-ratio: 1/1;
-      cursor: pointer;
-      box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.15), 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .bubble:active {
-      transform: scale(0.9);
-      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.2);
-    }
-    .bubble.popped {
-      background: #d0e2e8;
-      transform: scale(0.9);
-      opacity: 0.6;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    /* Spinner */
-    .spinner-wrap {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #f8fbfc, #d7e3e8);
-      box-shadow: inset 0 -6px 10px rgba(255, 255, 255, 0.6), 0 8px 20px var(--shadow);
-      cursor: grab;
-    }
-    .spinner-wrap:active {
-      cursor: grabbing;
-    }
-    .spinner-center {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(180deg, #607d8b, #455a64);
-      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.2);
-    }
-    /* Control section */
-    .controls {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-    button {
-      border: none;
-      border-radius: 8px;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: #74a8b7;
-    }
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ultimate Fidget Playground</title>
+<style>
+  body {
+    margin: 0;
+    background: radial-gradient(circle at center, #1e2b33, #0c1216);
+    color: #f0f8ff;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 10px;
+    color: #9cd0ff;
+  }
+  p {
+    color: #8fb5cc;
+  }
+  .fidgets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+  }
+  .panel {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+  /* Bubble Wrap */
+  .bubble-wrap {
+    display: grid;
+    grid-template-columns: repeat(6, 80px);
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
+  }
+  .bubble {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #aee1ff, #366b87 70%);
+    cursor: pointer;
+    box-shadow: inset 0 -4px 10px rgba(0,0,0,0.4), 0 3px 10px rgba(0,0,0,0.3);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .bubble.popped {
+    background: radial-gradient(circle at 30% 30%, #587d8c, #234652);
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #00bcd4;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+  button:hover { background: #009cb3; }
+
+  /* Fidget Spinner */
+  .spinner-container {
+    width: 350px;
+    height: 350px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, #203c46, #162a32);
+    border-radius: 50%;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .spinner-arm {
+    position: absolute;
+    width: 280px;
+    height: 80px;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    border-radius: 50px;
+    transform-origin: center;
+  }
+  .spinner-center {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: #222;
+    border: 5px solid #00bcd4;
+    border-radius: 50%;
+    box-shadow: inset 0 0 10px #00e0ff;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Calm Interactive Fidgets</h1>
-      <p>Relax and unwind with smooth, realistic tactile toys — bubble wrap and spinner.</p>
-    </header>
-    <div class="panel fidgets">
-      <div>
-        <h3>Bubble Wrap</h3>
-        <div class="bubble-wrap" id="bubbleWrap"></div>
-        <div class="controls">
-          <button id="resetBubbles">Reset</button>
-          <div id="popCount">0 popped</div>
-        </div>
-      </div>
-      <div>
-        <h3>Fidget Spinner</h3>
-        <div class="spinner-wrap" id="spinner">
-          <div class="spinner-center"></div>
-        </div>
-        <div class="controls">
-          <button id="spin">Spin</button>
-          <button id="stop">Stop</button>
-        </div>
-      </div>
-    </div>
-    <footer>Built for calm focus and smooth interactions — best with touch or mouse input.</footer>
+<h1>Ultimate Fidget Playground</h1>
+<p>Pop, spin, stretch, and relax — realistic, physics-based fidgets!</p>
+<div class="fidgets">
+  <div class="panel">
+    <h2>Bubble Wrap</h2>
+    <div class="bubble-wrap" id="bubbleWrap"></div>
+    <button id="resetBubbles">Reset</button>
   </div>
-  <script>
-    // Bubble wrap logic
-    const bubbleWrap = document.getElementById('bubbleWrap');
-    const popCount = document.getElementById('popCount');
-    const resetBubbles = document.getElementById('resetBubbles');
-    let popped = 0;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function makeSound(frequency) {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.frequency.value = frequency;
-      osc.start();
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
-      osc.stop(audioCtx.currentTime + 0.15);
-    }
-
-    function createBubbles(rows = 8, cols = 10) {
-      bubbleWrap.innerHTML = '';
-      for (let i = 0; i < rows * cols; i++) {
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.addEventListener('click', () => {
-          if (!bubble.classList.contains('popped')) {
-            bubble.classList.add('popped');
-            popped++;
-            popCount.textContent = `${popped} popped`;
-            makeSound(800 + Math.random() * 200);
-          }
-        });
-        bubbleWrap.appendChild(bubble);
+  <div class="panel">
+    <h2>Fidget Spinner</h2>
+    <div class="spinner-container" id="spinner">
+      <div class="spinner-arm" style="transform: rotate(0deg) translateX(0);"></div>
+      <div class="spinner-arm" style="transform: rotate(120deg) translateX(0);"></div>
+      <div class="spinner-arm" style="transform: rotate(240deg) translateX(0);"></div>
+      <div class="spinner-center"></div>
+    </div>
+  </div>
+</div>
+<script>
+// Bubble wrap setup
+const bubbleWrap = document.getElementById('bubbleWrap');
+const resetBubbles = document.getElementById('resetBubbles');
+let popSoundCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playPop() {
+  const osc = popSoundCtx.createOscillator();
+  const gain = popSoundCtx.createGain();
+  osc.connect(gain);
+  gain.connect(popSoundCtx.destination);
+  osc.frequency.value = 400 + Math.random() * 200;
+  gain.gain.setValueAtTime(0.1, popSoundCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, popSoundCtx.currentTime + 0.15);
+  osc.start();
+  osc.stop(popSoundCtx.currentTime + 0.15);
+}
+function createBubbles(rows = 4, cols = 6) {
+  bubbleWrap.innerHTML = '';
+  for (let i = 0; i < rows * cols; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.onclick = () => {
+      if (!b.classList.contains('popped')) {
+        b.classList.add('popped');
+        playPop();
       }
-    }
-
-    createBubbles();
-
-    resetBubbles.onclick = () => {
-      popped = 0;
-      popCount.textContent = '0 popped';
-      createBubbles();
     };
+    bubbleWrap.appendChild(b);
+  }
+}
+createBubbles();
+resetBubbles.onclick = () => createBubbles();
 
-    // Spinner logic
-    const spinner = document.getElementById('spinner');
-    let angle = 0;
-    let velocity = 0;
-    let spinning = false;
+// Spinner physics
+const spinner = document.getElementById('spinner');
+let spinning = false;
+let spinVelocity = 0;
+let angle = 0;
+let dragStart = null;
+let lastAngle = 0;
+function renderSpinner() {
+  angle += spinVelocity;
+  spinVelocity *= 0.985;
+  spinner.style.transform = `rotate(${angle}deg)`;
+  requestAnimationFrame(renderSpinner);
+}
+renderSpinner();
+spinner.addEventListener('mousedown', (e) => {
+  spinning = true;
+  dragStart = e.clientX;
+  lastAngle = angle;
+});
+document.addEventListener('mouseup', (e) => {
+  if (spinning) {
+    const diff = e.clientX - dragStart;
+    spinVelocity = diff * 0.5;
+    spinning = false;
+  }
+});
 
-    function animateSpinner() {
-      if (Math.abs(velocity) > 0.001) {
-        angle += velocity;
-        velocity *= 0.985;
-        spinner.style.transform = `rotate(${angle}deg)`;
-      }
-      requestAnimationFrame(animateSpinner);
-    }
-    animateSpinner();
-
-    document.getElementById('spin').onclick = () => {
-      velocity += 20 + Math.random() * 20;
-      makeSound(300);
-    };
-    document.getElementById('stop').onclick = () => {
-      velocity = 0;
-    };
-
-    spinner.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      const startX = e.clientX;
-      const rect = spinner.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const dir = startX < centerX ? -1 : 1;
-      velocity = 40 * dir;
-      makeSound(200);
-    });
-  </script>
+document.addEventListener('mousemove', (e) => {
+  if (spinning) {
+    const diff = e.clientX - dragStart;
+    angle = lastAngle + diff;
+  }
+});
+</script>
 </body>
 </html>
