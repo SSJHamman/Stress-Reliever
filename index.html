@@ -77,28 +77,8 @@
     <canvas id="magnetic" width="250" height="250"></canvas>
   </div>
   <div class="panel">
-    <h2>Elastic Slider</h2>
-    <canvas id="slider" width="250" height="80"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Soft Wave Fidget</h2>
-    <canvas id="wave" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Color Ripple Touch</h2>
-    <canvas id="ripple" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Floating Orbs</h2>
-    <canvas id="floating" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Calm Liquid Ripples</h2>
-    <canvas id="liquid" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Soothing Particle Flow</h2>
-    <canvas id="particles" width="250" height="250"></canvas>
+    <h2>Keyboard Key Fidget</h2>
+    <canvas id="keyboardKey" width="250" height="150"></canvas>
   </div>
 </div>
 <script>
@@ -222,23 +202,33 @@ function drawMagnets(){
 }
 drawMagnets();
 
-// Floating Orbs, Liquid Ripples, Particles: same as before
-const floatCanvas=document.getElementById('floating');
-const fCtx=floatCanvas.getContext('2d');
-let orbs=[];for(let i=0;i<12;i++) orbs.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,r:8+Math.random()*6});
-function drawFloating(){fCtx.clearRect(0,0,floatCanvas.width,floatCanvas.height);for(let o of orbs){o.x+=o.dx;o.y+=o.dy;if(o.x<0||o.x>250)o.dx*=-1;if(o.y<0||o.y>250)o.dy*=-1;fCtx.beginPath();fCtx.arc(o.x,o.y,o.r,0,Math.PI*2);fCtx.fillStyle='rgba(0,200,255,0.4)';fCtx.fill();}requestAnimationFrame(drawFloating);}
-drawFloating();
-const liquidCanvas=document.getElementById('liquid');
-const lCtx=liquidCanvas.getContext('2d');
-let ripples2=[];
-liquidCanvas.addEventListener('mousedown',e=>{const rect=liquidCanvas.getBoundingClientRect();const x=e.clientX-rect.left;const y=e.clientY-rect.top;ripples2.push({x,y,radius:0,alpha:1});});
-function drawLiquid(){lCtx.clearRect(0,0,liquidCanvas.width,liquidCanvas.height);for(let i=ripples2.length-1;i>=0;i--){let r=ripples2[i];r.radius+=2;r.alpha*=0.95;lCtx.beginPath();lCtx.arc(r.x,r.y,r.radius,0,Math.PI*2);lCtx.strokeStyle=`rgba(0,180,255,${r.alpha})`;lCtx.lineWidth=3;lCtx.stroke();if(r.alpha<0.05) ripples2.splice(i,1);}requestAnimationFrame(drawLiquid);}
-drawLiquid();
-const particleCanvas=document.getElementById('particles');
-const pCtx=particleCanvas.getContext('2d');
-let particles=[];for(let i=0;i<50;i++) particles.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*1,dy:(Math.random()-0.5)*1,r:2+Math.random()*3});
-function drawParticles(){pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height);for(let p of particles){p.x+=p.dx;p.y+=p.dy;if(p.x<0||p.x>250)p.dx*=-1;if(p.y<0||p.y>250)p.dy*=-1;pCtx.beginPath();pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);pCtx.fillStyle='rgba(0,150,255,0.5)';pCtx.fill();}requestAnimationFrame(drawParticles);}
-drawParticles();
+// Keyboard Key Fidget
+const keyCanvas=document.getElementById('keyboardKey');
+const keyCtx=keyCanvas.getContext('2d');
+let pressAmt=0,pressTarget=0;
+function drawKey(){
+  keyCtx.clearRect(0,0,keyCanvas.width,keyCanvas.height);
+  keyCtx.save();
+  keyCtx.translate(keyCanvas.width/2,keyCanvas.height/2);
+  keyCtx.beginPath();
+  keyCtx.roundRect(-80, -40+pressAmt, 160, 80, 15);
+  keyCtx.fillStyle='#6cf';
+  keyCtx.fill();
+  keyCtx.strokeStyle='#2a3a4a';
+  keyCtx.lineWidth=4;
+  keyCtx.stroke();
+  keyCtx.fillStyle='#000';
+  keyCtx.font='bold 28px Segoe UI';
+  keyCtx.textAlign='center';
+  keyCtx.textBaseline='middle';
+  keyCtx.fillText('CLICK',0,pressAmt);
+  keyCtx.restore();
+  pressAmt=lerp(pressAmt,pressTarget,0.25);
+  requestAnimationFrame(drawKey);
+}
+keyCanvas.addEventListener('mousedown',()=>{pressTarget=10;});
+window.addEventListener('mouseup',()=>{pressTarget=0;});
+drawKey();
 </script>
 </body>
 </html>
