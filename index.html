@@ -7,8 +7,8 @@
 <style>
   body {
     margin: 0;
-    background: radial-gradient(circle at center, #1e2b33, #0c1216);
-    color: #f0f8ff;
+    background: radial-gradient(circle at center, #1a242b, #0a0f12);
+    color: #e6f8ff;
     font-family: 'Segoe UI', Roboto, sans-serif;
     display: flex;
     flex-direction: column;
@@ -30,7 +30,7 @@
     gap: 30px;
     justify-content: center;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
   }
   .panel {
     background: rgba(255,255,255,0.05);
@@ -105,6 +105,44 @@
     border-radius: 50%;
     box-shadow: inset 0 0 10px #00e0ff;
   }
+  /* Stress Ball */
+  .stress-ball {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff7f50, #ff4500 80%);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: bold;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.1s ease;
+  }
+  /* Slider Cube */
+  .slider-cube {
+    width: 250px;
+    height: 250px;
+    background: linear-gradient(145deg, #292f33, #1b1f22);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: inset 0 4px 8px rgba(255,255,255,0.05), 0 8px 20px rgba(0,0,0,0.6);
+  }
+  .cube-tile {
+    background: #00bcd4;
+    border-radius: 6px;
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .cube-tile:hover {
+    background: #008fa1;
+    transform: scale(1.1);
+  }
 </style>
 </head>
 <body>
@@ -124,6 +162,14 @@
       <div class="spinner-arm" style="transform: rotate(240deg) translateX(0);"></div>
       <div class="spinner-center"></div>
     </div>
+  </div>
+  <div class="panel">
+    <h2>Stress Ball</h2>
+    <div class="stress-ball" id="stressBall">Squeeze!</div>
+  </div>
+  <div class="panel">
+    <h2>Slider Cube</h2>
+    <div class="slider-cube" id="sliderCube"></div>
   </div>
 </div>
 <script>
@@ -185,13 +231,44 @@ document.addEventListener('mouseup', (e) => {
     spinning = false;
   }
 });
-
 document.addEventListener('mousemove', (e) => {
   if (spinning) {
     const diff = e.clientX - dragStart;
     angle = lastAngle + diff;
   }
 });
+
+// Stress ball
+const stressBall = document.getElementById('stressBall');
+let scale = 1;
+let squishing = false;
+stressBall.addEventListener('mousedown', () => {
+  squishing = true;
+  stressBall.style.transform = 'scale(0.85)';
+});
+document.addEventListener('mouseup', () => {
+  if (squishing) {
+    stressBall.style.transform = 'scale(1)';
+    squishing = false;
+  }
+});
+
+// Slider cube
+const sliderCube = document.getElementById('sliderCube');
+function createTiles(n=9){
+  sliderCube.innerHTML='';
+  for(let i=0;i<n;i++){
+    const t=document.createElement('div');
+    t.className='cube-tile';
+    t.onclick=()=>{
+      t.style.background = `hsl(${Math.random()*360},70%,50%)`;
+      t.style.transform='scale(1.2)';
+      setTimeout(()=>t.style.transform='scale(1)',150);
+    }
+    sliderCube.appendChild(t);
+  }
+}
+createTiles();
 </script>
 </body>
 </html>
