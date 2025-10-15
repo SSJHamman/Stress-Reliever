@@ -3,232 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calming Interactive Fidgets</title>
+<title>Relaxing Fidget Playground</title>
 <style>
   body {
     margin: 0;
-    background: linear-gradient(135deg, #1c1c1c, #2c3e50, #34495e);
     font-family: 'Segoe UI', sans-serif;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  h1 {
-    margin-bottom: 15px;
-    color: #a1eafb;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  }
-  .fidgets {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    justify-content: center;
-    width: 100%;
-    max-width: 1400px;
-  }
-  .panel {
-    background: rgba(255,255,255,0.05);
-    border-radius: 40px;
-    padding: 20px;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background: radial-gradient(circle at top left, #1f1f1f, #0d0d0d);
+    overflow: hidden;
+    color: white;
   }
   canvas {
-    border-radius: 25px;
-    cursor: pointer;
-    background: rgba(0,0,0,0.1);
+    display: block;
+  }
+  #ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
   }
   button {
-    margin-top: 10px;
-    padding: 10px 20px;
+    background: #2c2c2c;
     border: none;
-    border-radius: 15px;
-    background: #00d4ff;
-    color: #000;
-    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
     cursor: pointer;
+    margin-right: 10px;
     transition: background 0.2s;
   }
   button:hover {
-    background: #00a3b5;
-    color: #fff;
+    background: #444;
+  }
+  #keyboardKey {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(145deg, #3a3a3a, #1e1e1e);
+    border-radius: 12px;
+    box-shadow: 0 8px 0 #101010, 0 12px 20px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    user-select: none;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  #keyboardKey:active {
+    transform: translateY(8px);
+    box-shadow: 0 2px 0 #101010, 0 6px 12px rgba(0,0,0,0.5);
   }
 </style>
 </head>
 <body>
-<h1>Calming Interactive Fidgets</h1>
-<div class="fidgets">
-  <div class="panel">
-    <h2>Bubble Wrap</h2>
-    <canvas id="bubbleWrap" width="320" height="320"></canvas>
-    <button id="resetBubbles">Reset</button>
-  </div>
-  <div class="panel">
-    <h2>Fidget Spinner</h2>
-    <canvas id="spinner" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Magnetic Balls</h2>
-    <canvas id="magnetic" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Keyboard Key Fidget</h2>
-    <canvas id="keyboardKey" width="250" height="150"></canvas>
-  </div>
-</div>
-<script>
-function lerp(a,b,t){return a+(b-a)*t;}
 
-// Bubble Wrap
-const bwCanvas=document.getElementById('bubbleWrap');
-const bwCtx=bwCanvas.getContext('2d');
-const bubbleSize=50;
-const cols=Math.floor(bwCanvas.width/bubbleSize);
-const rows=Math.floor(bwCanvas.height/bubbleSize);
-let popped=Array(cols*rows).fill(false);
-function drawBubbles(){
-  bwCtx.clearRect(0,0,bwCanvas.width,bwCanvas.height);
-  for(let i=0;i<cols;i++){
-    for(let j=0;j<rows;j++){
-      const idx=j*cols+i;
-      const x=i*bubbleSize+bubbleSize/2;
-      const y=j*bubbleSize+bubbleSize/2;
-      bwCtx.beginPath();
-      bwCtx.arc(x,y,bubbleSize/2-4,0,Math.PI*2);
-      bwCtx.fillStyle=popped[idx]?'#333':'#6cf';
-      bwCtx.fill();
-      bwCtx.strokeStyle='#2a3a4a';
-      bwCtx.lineWidth=3;
-      bwCtx.stroke();
+<div id="ui">
+  <button id="resetBubble">Reset Bubble Wrap</button>
+</div>
+<canvas id="fidgetCanvas"></canvas>
+<div id="keyboardKey">A</div>
+
+<script>
+const canvas = document.getElementById('fidgetCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let bubbles = [];
+let spinner = { x: canvas.width / 2, y: canvas.height / 2, radius: 80, angle: 0, speed: 0, dragging: false };
+let magnets = [];
+const bubbleCols = 8;
+const bubbleRows = 5;
+const bubbleSize = 80;
+
+// 🫧 BUBBLE WRAP
+function createBubbles() {
+  bubbles = [];
+  for (let y = 0; y < bubbleRows; y++) {
+    for (let x = 0; x < bubbleCols; x++) {
+      bubbles.push({
+        x: 100 + x * (bubbleSize + 10),
+        y: 100 + y * (bubbleSize + 10),
+        popped: false
+      });
     }
   }
 }
-bwCanvas.addEventListener('mousedown',e=>{
-  const rect=bwCanvas.getBoundingClientRect();
-  const x=e.clientX-rect.left;
-  const y=e.clientY-rect.top;
-  const i=Math.floor(x/bubbleSize);
-  const j=Math.floor(y/bubbleSize);
-  const idx=j*cols+i;
-  popped[idx]=true;
-  drawBubbles();
-});
-document.getElementById('resetBubbles').addEventListener('click',()=>{popped.fill(false); drawBubbles();});
-drawBubbles();
+createBubbles();
 
-// Fidget Spinner
-const spinCanvas=document.getElementById('spinner');
-const spinCtx=spinCanvas.getContext('2d');
-let spinAngle=0,spinVel=0,drag=false,startAngle=0;
-function drawSpinner(){
-  spinCtx.clearRect(0,0,spinCanvas.width,spinCanvas.height);
-  spinCtx.save();
-  spinCtx.translate(125,125);
-  spinCtx.rotate(spinAngle);
-  spinCtx.fillStyle='#0ff';
-  for(let i=0;i<3;i++){
-    spinCtx.beginPath();
-    spinCtx.arc(80,0,30,0,Math.PI*2);
-    spinCtx.fill();
-    spinCtx.rotate(2*Math.PI/3);
-  }
-  spinCtx.beginPath();
-  spinCtx.arc(0,0,25,0,Math.PI*2);
-  spinCtx.fillStyle='#08f';
-  spinCtx.fill();
-  spinCtx.restore();
-  spinAngle+=spinVel;
-  spinVel*=0.97;
-  requestAnimationFrame(drawSpinner);
+// 🧲 MAGNETIC BALLS
+for (let i = 0; i < 6; i++) {
+  magnets.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: 0,
+    vy: 0,
+    radius: 15
+  });
 }
-spinCanvas.addEventListener('mousedown',e=>{
-  const rect=spinCanvas.getBoundingClientRect();
-  const x=e.clientX-rect.left-125;
-  const y=e.clientY-rect.top-125;
-  startAngle=Math.atan2(y,x)-spinAngle;
-  drag=true;
-});
-window.addEventListener('mouseup',()=>{drag=false;});
-window.addEventListener('mousemove',e=>{
-  if(drag){
-    const rect=spinCanvas.getBoundingClientRect();
-    const x=e.clientX-rect.left-125;
-    const y=e.clientY-rect.top-125;
-    const newAngle=Math.atan2(y,x);
-    spinVel=lerp(spinVel,newAngle-spinAngle-startAngle,0.2);
-    spinAngle=newAngle-startAngle;
-  }
-});
-drawSpinner();
 
-// Magnetic Balls
-const magCanvas=document.getElementById('magnetic');
-const magCtx=magCanvas.getContext('2d');
-let magnets=[];
-for(let i=0;i<10;i++){
-  magnets.push({x:Math.random()*230+10,y:Math.random()*230+10,dx:0,dy:0,r:12});
-}
-let magDrag=null;
-magCanvas.addEventListener('mousedown',e=>{
-  const rect=magCanvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left;
-  const my=e.clientY-rect.top;
-  magDrag=magnets.find(b=>Math.hypot(b.x-mx,b.y-my)<b.r);
-});
-window.addEventListener('mouseup',()=>{magDrag=null;});
-window.addEventListener('mousemove',e=>{
-  if(magDrag){
-    const rect=magCanvas.getBoundingClientRect();
-    let mx=e.clientX-rect.left;
-    let my=e.clientY-rect.top;
-    magDrag.x=Math.min(Math.max(mx,magDrag.r),magCanvas.width-magDrag.r);
-    magDrag.y=Math.min(Math.max(my,magDrag.r),magCanvas.height-magDrag.r);
-  }
-});
-function drawMagnets(){
-  magCtx.clearRect(0,0,magCanvas.width,magCanvas.height);
-  for(let b of magnets){
-    magCtx.beginPath();
-    magCtx.arc(b.x,b.y,b.r,0,Math.PI*2);
-    magCtx.fillStyle='rgba(0,255,200,0.5)';
-    magCtx.fill();
-  }
-  requestAnimationFrame(drawMagnets);
-}
-drawMagnets();
+// 🎨 DRAW EVERYTHING
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-// Keyboard Key Fidget
-const keyCanvas=document.getElementById('keyboardKey');
-const keyCtx=keyCanvas.getContext('2d');
-let pressAmt=0,pressTarget=0;
-function drawKey(){
-  keyCtx.clearRect(0,0,keyCanvas.width,keyCanvas.height);
-  keyCtx.save();
-  keyCtx.translate(keyCanvas.width/2,keyCanvas.height/2);
-  keyCtx.beginPath();
-  keyCtx.roundRect(-80, -40+pressAmt, 160, 80, 15);
-  keyCtx.fillStyle='#6cf';
-  keyCtx.fill();
-  keyCtx.strokeStyle='#2a3a4a';
-  keyCtx.lineWidth=4;
-  keyCtx.stroke();
-  keyCtx.fillStyle='#000';
-  keyCtx.font='bold 28px Segoe UI';
-  keyCtx.textAlign='center';
-  keyCtx.textBaseline='middle';
-  keyCtx.fillText('CLICK',0,pressAmt);
-  keyCtx.restore();
-  pressAmt=lerp(pressAmt,pressTarget,0.25);
-  requestAnimationFrame(drawKey);
+  // Bubble Wrap
+  for (const b of bubbles) {
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, bubbleSize / 2, 0, Math.PI * 2);
+    const grd = ctx.createRadialGradient(b.x, b.y, 10, b.x, b.y, bubbleSize / 2);
+    grd.addColorStop(0, b.popped ? '#222' : '#88ddee');
+    grd.addColorStop(1, '#113344');
+    ctx.fillStyle = grd;
+    ctx.fill();
+  }
+
+  // Fidget Spinner
+  ctx.save();
+  ctx.translate(spinner.x, spinner.y);
+  ctx.rotate(spinner.angle);
+  for (let i = 0; i < 3; i++) {
+    const angle = (i * Math.PI * 2) / 3;
+    const bx = Math.cos(angle) * spinner.radius;
+    const by = Math.sin(angle) * spinner.radius;
+    ctx.beginPath();
+    ctx.arc(bx, by, 30, 0, Math.PI * 2);
+    ctx.fillStyle = '#66aaff';
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.arc(0, 0, 25, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.restore();
+
+  // Magnetic Balls
+  for (let m of magnets) {
+    ctx.beginPath();
+    const grad = ctx.createRadialGradient(m.x, m.y, 3, m.x, m.y, m.radius);
+    grad.addColorStop(0, '#aaf');
+    grad.addColorStop(1, '#227');
+    ctx.fillStyle = grad;
+    ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
-keyCanvas.addEventListener('mousedown',()=>{pressTarget=10;});
-window.addEventListener('mouseup',()=>{pressTarget=0;});
-drawKey();
+
+function update() {
+  // Spinner motion
+  spinner.angle += spinner.speed;
+  spinner.speed *= 0.985;
+
+  // Magnetic motion
+  for (let i = 0; i < magnets.length; i++) {
+    for (let j = i + 1; j < magnets.length; j++) {
+      const a = magnets[i], b = magnets[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy);
+      const minDist = a.radius + b.radius;
+      if (dist < minDist) {
+        const overlap = (minDist - dist) / 2;
+        const nx = dx / dist, ny = dy / dist;
+        a.x -= nx * overlap;
+        a.y -= ny * overlap;
+        b.x += nx * overlap;
+        b.y += ny * overlap;
+      }
+      const force = 1000 / (dist * dist);
+      a.vx -= (dx / dist) * force;
+      a.vy -= (dy / dist) * force;
+      b.vx += (dx / dist) * force;
+      b.vy += (dy / dist) * force;
+    }
+  }
+
+  for (let m of magnets) {
+    m.x += m.vx;
+    m.y += m.vy;
+    m.vx *= 0.9;
+    m.vy *= 0.9;
+    if (m.x < m.radius || m.x > canvas.width - m.radius) m.vx *= -1;
+    if (m.y < m.radius || m.y > canvas.height - m.radius) m.vy *= -1;
+    m.x = Math.max(m.radius, Math.min(canvas.width - m.radius, m.x));
+    m.y = Math.max(m.radius, Math.min(canvas.height - m.radius, m.y));
+  }
+}
+
+function animate() {
+  update();
+  draw();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// 🖱️ INTERACTIONS
+canvas.addEventListener('mousedown', e => {
+  const dx = e.offsetX - spinner.x;
+  const dy = e.offsetY - spinner.y;
+  if (Math.hypot(dx, dy) < spinner.radius + 30) {
+    spinner.dragging = true;
+    spinner.lastAngle = Math.atan2(dy, dx);
+    spinner.speed = 0;
+  }
+  for (const b of bubbles) {
+    const bx = e.offsetX - b.x;
+    const by = e.offsetY - b.y;
+    if (Math.hypot(bx, by) < bubbleSize / 2 && !b.popped) b.popped = true;
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (spinner.dragging) {
+    const dx = e.offsetX - spinner.x;
+    const dy = e.offsetY - spinner.y;
+    const newAngle = Math.atan2(dy, dx);
+    const diff = newAngle - spinner.lastAngle;
+    spinner.angle += diff;
+    spinner.speed = diff * 2; // High sensitivity
+    spinner.lastAngle = newAngle;
+  }
+});
+
+canvas.addEventListener('mouseup', () => {
+  spinner.dragging = false;
+});
+
+document.getElementById('resetBubble').onclick = createBubbles;
+
+// KEYBOARD KEY
+const key = document.getElementById('keyboardKey');
+key.addEventListener('click', () => {
+  key.style.transform = 'translateY(8px)';
+  key.style.boxShadow = '0 2px 0 #101010, 0 6px 12px rgba(0,0,0,0.5)';
+  setTimeout(() => {
+    key.style.transform = 'translateY(0px)';
+    key.style.boxShadow = '0 8px 0 #101010, 0 12px 20px rgba(0,0,0,0.6)';
+  }, 150);
+});
 </script>
 </body>
 </html>
