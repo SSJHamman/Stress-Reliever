@@ -73,11 +73,7 @@
     <canvas id="spinner" width="250" height="250"></canvas>
   </div>
   <div class="panel">
-    <h2>Color Orbit</h2>
-    <canvas id="orbit" width="250" height="250"></canvas>
-  </div>
-  <div class="panel">
-    <h2>Magnetic Dots</h2>
+    <h2>Magnetic Balls</h2>
     <canvas id="magnetic" width="250" height="250"></canvas>
   </div>
   <div class="panel">
@@ -109,13 +105,13 @@
 function lerp(a,b,t){return a+(b-a)*t;}
 
 // Bubble Wrap
-const bwCanvas = document.getElementById('bubbleWrap');
-const bwCtx = bwCanvas.getContext('2d');
-const bubbleSize = 50;
-const cols = Math.floor(bwCanvas.width / bubbleSize);
-const rows = Math.floor(bwCanvas.height / bubbleSize);
-let popped = Array(cols*rows).fill(false);
-function drawBubbles() {
+const bwCanvas=document.getElementById('bubbleWrap');
+const bwCtx=bwCanvas.getContext('2d');
+const bubbleSize=50;
+const cols=Math.floor(bwCanvas.width/bubbleSize);
+const rows=Math.floor(bwCanvas.height/bubbleSize);
+let popped=Array(cols*rows).fill(false);
+function drawBubbles(){
   bwCtx.clearRect(0,0,bwCanvas.width,bwCanvas.height);
   for(let i=0;i<cols;i++){
     for(let j=0;j<rows;j++){
@@ -132,7 +128,7 @@ function drawBubbles() {
     }
   }
 }
-bwCanvas.addEventListener('mousedown', e=>{
+bwCanvas.addEventListener('mousedown',e=>{
   const rect=bwCanvas.getBoundingClientRect();
   const x=e.clientX-rect.left;
   const y=e.clientY-rect.top;
@@ -142,17 +138,13 @@ bwCanvas.addEventListener('mousedown', e=>{
   popped[idx]=true;
   drawBubbles();
 });
-document.getElementById('resetBubbles').addEventListener('click',()=>{
-  popped.fill(false);
-  drawBubbles();
-});
+document.getElementById('resetBubbles').addEventListener('click',()=>{popped.fill(false); drawBubbles();});
 drawBubbles();
 
 // Fidget Spinner
 const spinCanvas=document.getElementById('spinner');
 const spinCtx=spinCanvas.getContext('2d');
-let spinAngle=0, spinVel=0, drag=false;
-let startAngle=0;
+let spinAngle=0,spinVel=0,drag=false,startAngle=0;
 function drawSpinner(){
   spinCtx.clearRect(0,0,spinCanvas.width,spinCanvas.height);
   spinCtx.save();
@@ -174,7 +166,7 @@ function drawSpinner(){
   spinVel*=0.97;
   requestAnimationFrame(drawSpinner);
 }
-spinCanvas.addEventListener('mousedown', e=>{
+spinCanvas.addEventListener('mousedown',e=>{
   const rect=spinCanvas.getBoundingClientRect();
   const x=e.clientX-rect.left-125;
   const y=e.clientY-rect.top-125;
@@ -194,71 +186,58 @@ window.addEventListener('mousemove',e=>{
 });
 drawSpinner();
 
-// Floating Orbs
+// Magnetic Balls
+const magCanvas=document.getElementById('magnetic');
+const magCtx=magCanvas.getContext('2d');
+let magnets=[];
+for(let i=0;i<10;i++){
+  magnets.push({x:Math.random()*230+10,y:Math.random()*230+10,dx:0,dy:0,r:12});
+}
+let magDrag=null;
+magCanvas.addEventListener('mousedown',e=>{
+  const rect=magCanvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left;
+  const my=e.clientY-rect.top;
+  magDrag=magnets.find(b=>Math.hypot(b.x-mx,b.y-my)<b.r);
+});
+window.addEventListener('mouseup',()=>{magDrag=null;});
+window.addEventListener('mousemove',e=>{
+  if(magDrag){
+    const rect=magCanvas.getBoundingClientRect();
+    let mx=e.clientX-rect.left;
+    let my=e.clientY-rect.top;
+    magDrag.x=Math.min(Math.max(mx,magDrag.r),magCanvas.width-magDrag.r);
+    magDrag.y=Math.min(Math.max(my,magDrag.r),magCanvas.height-magDrag.r);
+  }
+});
+function drawMagnets(){
+  magCtx.clearRect(0,0,magCanvas.width,magCanvas.height);
+  for(let b of magnets){
+    magCtx.beginPath();
+    magCtx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    magCtx.fillStyle='rgba(0,255,200,0.5)';
+    magCtx.fill();
+  }
+  requestAnimationFrame(drawMagnets);
+}
+drawMagnets();
+
+// Floating Orbs, Liquid Ripples, Particles: same as before
 const floatCanvas=document.getElementById('floating');
 const fCtx=floatCanvas.getContext('2d');
-let orbs=[];
-for(let i=0;i<12;i++) orbs.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,r:8+Math.random()*6});
-function drawFloating(){
-  fCtx.clearRect(0,0,floatCanvas.width,floatCanvas.height);
-  for(let o of orbs){
-    o.x+=o.dx; o.y+=o.dy;
-    if(o.x<0||o.x>250)o.dx*=-1;
-    if(o.y<0||o.y>250)o.dy*=-1;
-    fCtx.beginPath();
-    fCtx.arc(o.x,o.y,o.r,0,Math.PI*2);
-    fCtx.fillStyle='rgba(0,200,255,0.4)';
-    fCtx.fill();
-  }
-  requestAnimationFrame(drawFloating);
-}
+let orbs=[];for(let i=0;i<12;i++) orbs.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,r:8+Math.random()*6});
+function drawFloating(){fCtx.clearRect(0,0,floatCanvas.width,floatCanvas.height);for(let o of orbs){o.x+=o.dx;o.y+=o.dy;if(o.x<0||o.x>250)o.dx*=-1;if(o.y<0||o.y>250)o.dy*=-1;fCtx.beginPath();fCtx.arc(o.x,o.y,o.r,0,Math.PI*2);fCtx.fillStyle='rgba(0,200,255,0.4)';fCtx.fill();}requestAnimationFrame(drawFloating);}
 drawFloating();
-
-// Calm Liquid Ripples
 const liquidCanvas=document.getElementById('liquid');
 const lCtx=liquidCanvas.getContext('2d');
 let ripples2=[];
-liquidCanvas.addEventListener('mousedown',e=>{
-  const rect=liquidCanvas.getBoundingClientRect();
-  const x=e.clientX-rect.left;
-  const y=e.clientY-rect.top;
-  ripples2.push({x,y,radius:0,alpha:1});
-});
-function drawLiquid(){
-  lCtx.clearRect(0,0,liquidCanvas.width,liquidCanvas.height);
-  for(let i=ripples2.length-1;i>=0;i--){
-    let r=ripples2[i];
-    r.radius+=2;
-    r.alpha*=0.95;
-    lCtx.beginPath();
-    lCtx.arc(r.x,r.y,r.radius,0,Math.PI*2);
-    lCtx.strokeStyle=`rgba(0,180,255,${r.alpha})`;
-    lCtx.lineWidth=3;
-    lCtx.stroke();
-    if(r.alpha<0.05) ripples2.splice(i,1);
-  }
-  requestAnimationFrame(drawLiquid);
-}
+liquidCanvas.addEventListener('mousedown',e=>{const rect=liquidCanvas.getBoundingClientRect();const x=e.clientX-rect.left;const y=e.clientY-rect.top;ripples2.push({x,y,radius:0,alpha:1});});
+function drawLiquid(){lCtx.clearRect(0,0,liquidCanvas.width,liquidCanvas.height);for(let i=ripples2.length-1;i>=0;i--){let r=ripples2[i];r.radius+=2;r.alpha*=0.95;lCtx.beginPath();lCtx.arc(r.x,r.y,r.radius,0,Math.PI*2);lCtx.strokeStyle=`rgba(0,180,255,${r.alpha})`;lCtx.lineWidth=3;lCtx.stroke();if(r.alpha<0.05) ripples2.splice(i,1);}requestAnimationFrame(drawLiquid);}
 drawLiquid();
-
-// Soothing Particle Flow
 const particleCanvas=document.getElementById('particles');
 const pCtx=particleCanvas.getContext('2d');
-let particles=[];
-for(let i=0;i<50;i++) particles.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*1,dy:(Math.random()-0.5)*1,r:2+Math.random()*3});
-function drawParticles(){
-  pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height);
-  for(let p of particles){
-    p.x+=p.dx; p.y+=p.dy;
-    if(p.x<0||p.x>250)p.dx*=-1;
-    if(p.y<0||p.y>250)p.dy*=-1;
-    pCtx.beginPath();
-    pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    pCtx.fillStyle='rgba(0,150,255,0.5)';
-    pCtx.fill();
-  }
-  requestAnimationFrame(drawParticles);
-}
+let particles=[];for(let i=0;i<50;i++) particles.push({x:Math.random()*250,y:Math.random()*250,dx:(Math.random()-0.5)*1,dy:(Math.random()-0.5)*1,r:2+Math.random()*3});
+function drawParticles(){pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height);for(let p of particles){p.x+=p.dx;p.y+=p.dy;if(p.x<0||p.x>250)p.dx*=-1;if(p.y<0||p.y>250)p.dy*=-1;pCtx.beginPath();pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);pCtx.fillStyle='rgba(0,150,255,0.5)';pCtx.fill();}requestAnimationFrame(drawParticles);}
 drawParticles();
 </script>
 </body>
