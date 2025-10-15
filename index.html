@@ -1,274 +1,226 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ultimate Fidget Playground</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactive Fidgets Zone</title>
 <style>
   body {
     margin: 0;
-    background: radial-gradient(circle at center, #1a242b, #0a0f12);
-    color: #e6f8ff;
-    font-family: 'Segoe UI', Roboto, sans-serif;
+    background: radial-gradient(circle at top, #222, #111);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    color: #eee;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    padding: 20px;
+    justify-content: center;
+    height: 100vh;
+    user-select: none;
   }
   h1 {
+    font-weight: 600;
     margin-bottom: 10px;
-    color: #9cd0ff;
   }
-  p {
-    color: #8fb5cc;
-  }
-  .fidgets {
+  .container {
     display: flex;
+    gap: 40px;
     flex-wrap: wrap;
-    gap: 30px;
     justify-content: center;
-    width: 100%;
-    max-width: 1400px;
+    align-items: center;
   }
-  .panel {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 20px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  }
-  /* Bubble Wrap */
-  .bubble-wrap {
-    display: grid;
-    grid-template-columns: repeat(6, 80px);
-    gap: 10px;
-    justify-content: center;
-    padding: 20px;
-  }
-  .bubble {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #aee1ff, #366b87 70%);
-    cursor: pointer;
-    box-shadow: inset 0 -4px 10px rgba(0,0,0,0.4), 0 3px 10px rgba(0,0,0,0.3);
-    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-  }
-  .bubble.popped {
-    background: radial-gradient(circle at 30% 30%, #587d8c, #234652);
-    transform: scale(0.9);
-    opacity: 0.7;
+  canvas {
+    background: #1b1b1b;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
   }
   button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background: #00bcd4;
-    color: #fff;
+    background: #444;
+    color: white;
     border: none;
     border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
     cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
+    margin-top: 15px;
+    transition: background 0.3s;
   }
-  button:hover { background: #009cb3; }
-
-  /* Fidget Spinner */
-  .spinner-container {
-    width: 350px;
-    height: 350px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: radial-gradient(circle at center, #203c46, #162a32);
-    border-radius: 50%;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.6);
-    overflow: hidden;
-  }
-  .spinner-arm {
-    position: absolute;
-    width: 280px;
-    height: 80px;
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    border-radius: 50px;
-    transform-origin: center;
-  }
-  .spinner-center {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background: #222;
-    border: 5px solid #00bcd4;
-    border-radius: 50%;
-    box-shadow: inset 0 0 10px #00e0ff;
-  }
-  /* Stress Ball */
-  .stress-ball {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ff7f50, #ff4500 80%);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    font-weight: bold;
-    cursor: grab;
-    user-select: none;
-    transition: transform 0.1s ease;
-  }
-  /* Slider Cube */
-  .slider-cube {
-    width: 250px;
-    height: 250px;
-    background: linear-gradient(145deg, #292f33, #1b1f22);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    border-radius: 10px;
-    padding: 6px;
-    box-shadow: inset 0 4px 8px rgba(255,255,255,0.05), 0 8px 20px rgba(0,0,0,0.6);
-  }
-  .cube-tile {
-    background: #00bcd4;
-    border-radius: 6px;
-    transition: transform 0.2s, background 0.2s;
-    cursor: pointer;
-  }
-  .cube-tile:hover {
-    background: #008fa1;
-    transform: scale(1.1);
+  button:hover {
+    background: #666;
   }
 </style>
 </head>
 <body>
-<h1>Ultimate Fidget Playground</h1>
-<p>Pop, spin, stretch, and relax — realistic, physics-based fidgets!</p>
-<div class="fidgets">
-  <div class="panel">
-    <h2>Bubble Wrap</h2>
-    <div class="bubble-wrap" id="bubbleWrap"></div>
-    <button id="resetBubbles">Reset</button>
-  </div>
-  <div class="panel">
-    <h2>Fidget Spinner</h2>
-    <div class="spinner-container" id="spinner">
-      <div class="spinner-arm" style="transform: rotate(0deg) translateX(0);"></div>
-      <div class="spinner-arm" style="transform: rotate(120deg) translateX(0);"></div>
-      <div class="spinner-arm" style="transform: rotate(240deg) translateX(0);"></div>
-      <div class="spinner-center"></div>
-    </div>
-  </div>
-  <div class="panel">
-    <h2>Stress Ball</h2>
-    <div class="stress-ball" id="stressBall">Squeeze!</div>
-  </div>
-  <div class="panel">
-    <h2>Slider Cube</h2>
-    <div class="slider-cube" id="sliderCube"></div>
-  </div>
+<h1>Interactive Fidgets Zone</h1>
+<div class="container">
+  <canvas id="bubbleWrap" width="300" height="300"></canvas>
+  <canvas id="spinner" width="250" height="250"></canvas>
+  <canvas id="stressBall" width="250" height="250"></canvas>
+  <canvas id="sliderCube" width="250" height="250"></canvas>
 </div>
+<button id="reset">Reset Bubble Wrap</button>
+<audio id="squishSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d1b8c0792a.mp3?filename=squish-2-96212.mp3"></audio>
 <script>
-// Bubble wrap setup
-const bubbleWrap = document.getElementById('bubbleWrap');
-const resetBubbles = document.getElementById('resetBubbles');
-let popSoundCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playPop() {
-  const osc = popSoundCtx.createOscillator();
-  const gain = popSoundCtx.createGain();
-  osc.connect(gain);
-  gain.connect(popSoundCtx.destination);
-  osc.frequency.value = 400 + Math.random() * 200;
-  gain.gain.setValueAtTime(0.1, popSoundCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, popSoundCtx.currentTime + 0.15);
-  osc.start();
-  osc.stop(popSoundCtx.currentTime + 0.15);
-}
-function createBubbles(rows = 4, cols = 6) {
-  bubbleWrap.innerHTML = '';
-  for (let i = 0; i < rows * cols; i++) {
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    b.onclick = () => {
-      if (!b.classList.contains('popped')) {
-        b.classList.add('popped');
-        playPop();
+// Bubble Wrap
+const bw = document.getElementById('bubbleWrap');
+const bwCtx = bw.getContext('2d');
+let bubbleSize = 40;
+let cols = Math.floor(bw.width / bubbleSize);
+let rows = Math.floor(bw.height / bubbleSize);
+let popped = Array(cols * rows).fill(false);
+function drawBubbles() {
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let idx = j * cols + i;
+      let x = i * bubbleSize + bubbleSize / 2;
+      let y = j * bubbleSize + bubbleSize / 2;
+      bwCtx.beginPath();
+      bwCtx.arc(x, y, bubbleSize/2 - 4, 0, Math.PI * 2);
+      if (popped[idx]) {
+        bwCtx.fillStyle = '#333';
+      } else {
+        bwCtx.fillStyle = 'linear-gradient(145deg,#444,#222)';
       }
-    };
-    bubbleWrap.appendChild(b);
-  }
-}
-createBubbles();
-resetBubbles.onclick = () => createBubbles();
-
-// Spinner physics
-const spinner = document.getElementById('spinner');
-let spinning = false;
-let spinVelocity = 0;
-let angle = 0;
-let dragStart = null;
-let lastAngle = 0;
-function renderSpinner() {
-  angle += spinVelocity;
-  spinVelocity *= 0.985;
-  spinner.style.transform = `rotate(${angle}deg)`;
-  requestAnimationFrame(renderSpinner);
-}
-renderSpinner();
-spinner.addEventListener('mousedown', (e) => {
-  spinning = true;
-  dragStart = e.clientX;
-  lastAngle = angle;
-});
-document.addEventListener('mouseup', (e) => {
-  if (spinning) {
-    const diff = e.clientX - dragStart;
-    spinVelocity = diff * 0.5;
-    spinning = false;
-  }
-});
-document.addEventListener('mousemove', (e) => {
-  if (spinning) {
-    const diff = e.clientX - dragStart;
-    angle = lastAngle + diff;
-  }
-});
-
-// Stress ball
-const stressBall = document.getElementById('stressBall');
-let scale = 1;
-let squishing = false;
-stressBall.addEventListener('mousedown', () => {
-  squishing = true;
-  stressBall.style.transform = 'scale(0.85)';
-});
-document.addEventListener('mouseup', () => {
-  if (squishing) {
-    stressBall.style.transform = 'scale(1)';
-    squishing = false;
-  }
-});
-
-// Slider cube
-const sliderCube = document.getElementById('sliderCube');
-function createTiles(n=9){
-  sliderCube.innerHTML='';
-  for(let i=0;i<n;i++){
-    const t=document.createElement('div');
-    t.className='cube-tile';
-    t.onclick=()=>{
-      t.style.background = `hsl(${Math.random()*360},70%,50%)`;
-      t.style.transform='scale(1.2)';
-      setTimeout(()=>t.style.transform='scale(1)',150);
+      bwCtx.strokeStyle = '#666';
+      bwCtx.lineWidth = 2;
+      bwCtx.stroke();
+      bwCtx.fill();
     }
-    sliderCube.appendChild(t);
   }
 }
-createTiles();
+function popBubble(e) {
+  const rect = bw.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const i = Math.floor(x / bubbleSize);
+  const j = Math.floor(y / bubbleSize);
+  const idx = j * cols + i;
+  if (!popped[idx]) {
+    popped[idx] = true;
+    drawBubbles();
+  }
+}
+bw.addEventListener('mousedown', popBubble);
+document.getElementById('reset').addEventListener('click', () => {
+  popped.fill(false);
+  drawBubbles();
+});
+
+// Fidget Spinner
+const spinner = document.getElementById('spinner');
+const sCtx = spinner.getContext('2d');
+let spinAngle = 0, spinVel = 0, spinning = false;
+let dragStartAngle, dragging = false;
+function drawSpinner() {
+  sCtx.clearRect(0,0,spinner.width,spinner.height);
+  sCtx.save();
+  sCtx.translate(125,125);
+  sCtx.rotate(spinAngle);
+  sCtx.fillStyle = '#0af';
+  for (let i=0;i<3;i++){
+    sCtx.beginPath();
+    sCtx.arc(80,0,30,0,Math.PI*2);
+    sCtx.fill();
+    sCtx.rotate((2*Math.PI)/3);
+  }
+  sCtx.beginPath();
+  sCtx.arc(0,0,25,0,Math.PI*2);
+  sCtx.fillStyle = '#0cf';
+  sCtx.fill();
+  sCtx.restore();
+  spinAngle += spinVel;
+  spinVel *= 0.99;
+  requestAnimationFrame(drawSpinner);
+}
+spinner.addEventListener('mousedown', e => {
+  const rect = spinner.getBoundingClientRect();
+  const x = e.clientX - rect.left - 125;
+  const y = e.clientY - rect.top - 125;
+  dragStartAngle = Math.atan2(y,x) - spinAngle;
+  dragging = true;
+});
+window.addEventListener('mouseup',()=> dragging=false);
+window.addEventListener('mousemove', e => {
+  if(dragging){
+    const rect = spinner.getBoundingClientRect();
+    const x = e.clientX - rect.left - 125;
+    const y = e.clientY - rect.top - 125;
+    const newAngle = Math.atan2(y,x);
+    const newSpinAngle = newAngle - dragStartAngle;
+    spinVel = newSpinAngle - spinAngle;
+    spinAngle = newSpinAngle;
+  }
+});
+
+// Stress Ball (squishy physics)
+const sb = document.getElementById('stressBall');
+const sbCtx = sb.getContext('2d');
+let sbX = 125, sbY = 125, sbR = 60, sbDrag = false;
+let deform = 0;
+let targetDeform = 0;
+function drawStressBall(){
+  sbCtx.clearRect(0,0,sb.width,sb.height);
+  deform += (targetDeform - deform)*0.2;
+  sbCtx.beginPath();
+  const gradient = sbCtx.createRadialGradient(sbX - deform*5, sbY - deform*5, sbR*0.3, sbX, sbY, sbR);
+  gradient.addColorStop(0, '#f9a');
+  gradient.addColorStop(1, '#f77');
+  sbCtx.fillStyle = gradient;
+  sbCtx.ellipse(sbX, sbY, sbR + deform*10, sbR - deform*5, 0, 0, Math.PI*2);
+  sbCtx.fill();
+  requestAnimationFrame(drawStressBall);
+}
+sb.addEventListener('mousedown',e=>{
+  const rect=sb.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  if(Math.hypot(x-sbX,y-sbY)<sbR){
+    sbDrag=true;
+    targetDeform=0.6;
+    document.getElementById('squishSound').play();
+  }
+});
+window.addEventListener('mouseup',()=>{
+  sbDrag=false;
+  targetDeform=0;
+});
+window.addEventListener('mousemove',e=>{
+  if(sbDrag){
+    const rect=sb.getBoundingClientRect();
+    sbX=e.clientX-rect.left;
+    sbY=e.clientY-rect.top;
+  }
+});
+
+// Slider Cube
+const sc = document.getElementById('sliderCube');
+const scCtx = sc.getContext('2d');
+let cubeX=50, cubeY=100, draggingCube=false;
+function drawSliderCube(){
+  scCtx.clearRect(0,0,sc.width,sc.height);
+  scCtx.fillStyle='#555';
+  scCtx.fillRect(40,90,170,70);
+  scCtx.fillStyle='#0f0';
+  scCtx.fillRect(cubeX, cubeY, 60, 60);
+  requestAnimationFrame(drawSliderCube);
+}
+sc.addEventListener('mousedown',e=>{
+  const rect=sc.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  if(x>cubeX&&x<cubeX+60&&y>cubeY&&y<cubeY+60) draggingCube=true;
+});
+window.addEventListener('mouseup',()=>draggingCube=false);
+window.addEventListener('mousemove',e=>{
+  if(draggingCube){
+    const rect=sc.getBoundingClientRect();
+    cubeX=Math.min(Math.max(e.clientX-rect.left-30,40),150);
+  }
+});
+
+// init
+requestAnimationFrame(drawBubbles);
+requestAnimationFrame(drawSpinner);
+requestAnimationFrame(drawStressBall);
+requestAnimationFrame(drawSliderCube);
 </script>
 </body>
 </html>
