@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stylish Interactive Fidgets</title>
+<title>Smooth Interactive Fidgets</title>
 <style>
   body {
     margin: 0;
@@ -14,7 +14,6 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    overflow-x: hidden;
   }
   h1 {
     margin-bottom: 15px;
@@ -31,23 +30,24 @@
   }
   .panel {
     background: rgba(255,255,255,0.05);
-    border-radius: 16px;
+    border-radius: 30px;
     padding: 20px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   canvas {
-    border-radius: 16px;
+    border-radius: 25px;
     cursor: pointer;
+    background: rgba(0,0,0,0.1);
   }
   button {
     margin-top: 10px;
     padding: 10px 20px;
     border: none;
-    border-radius: 10px;
+    border-radius: 15px;
     background: #00d4ff;
     color: #000;
     font-weight: bold;
@@ -61,7 +61,7 @@
 </style>
 </head>
 <body>
-<h1>Stylish Interactive Fidgets</h1>
+<h1>Smooth Interactive Fidgets</h1>
 <div class="fidgets">
   <div class="panel">
     <h2>Bubble Wrap</h2>
@@ -84,8 +84,18 @@
     <h2>Elastic Slider</h2>
     <canvas id="slider" width="250" height="80"></canvas>
   </div>
+  <div class="panel">
+    <h2>Soft Wave Fidget</h2>
+    <canvas id="wave" width="250" height="250"></canvas>
+  </div>
+  <div class="panel">
+    <h2>Color Ripple Touch</h2>
+    <canvas id="ripple" width="250" height="250"></canvas>
+  </div>
 </div>
 <script>
+function lerp(a,b,t){return a+(b-a)*t;}
+
 // Bubble Wrap
 const bwCanvas = document.getElementById('bubbleWrap');
 const bwCtx = bwCanvas.getContext('2d');
@@ -105,7 +115,7 @@ function drawBubbles() {
       bwCtx.fillStyle=popped[idx]?'#333':'#6cf';
       bwCtx.fill();
       bwCtx.strokeStyle='#2a3a4a';
-      bwCtx.lineWidth=2;
+      bwCtx.lineWidth=3;
       bwCtx.stroke();
     }
   }
@@ -126,7 +136,7 @@ document.getElementById('resetBubbles').addEventListener('click',()=>{
 });
 drawBubbles();
 
-// Spinner
+// Fidget Spinner
 const spinCanvas=document.getElementById('spinner');
 const spinCtx=spinCanvas.getContext('2d');
 let spinAngle=0, spinVel=0, drag=false;
@@ -149,7 +159,7 @@ function drawSpinner(){
   spinCtx.fill();
   spinCtx.restore();
   spinAngle+=spinVel;
-  spinVel*=0.98;
+  spinVel*=0.97;
   requestAnimationFrame(drawSpinner);
 }
 spinCanvas.addEventListener('mousedown', e=>{
@@ -166,7 +176,7 @@ window.addEventListener('mousemove',e=>{
     const x=e.clientX-rect.left-125;
     const y=e.clientY-rect.top-125;
     const newAngle=Math.atan2(y,x);
-    spinVel=newAngle-spinAngle-startAngle;
+    spinVel=lerp(spinVel,newAngle-spinAngle-startAngle,0.2);
     spinAngle=newAngle-startAngle;
   }
 });
@@ -215,8 +225,8 @@ window.addEventListener('mouseup',()=>{selectedDot=null;});
 window.addEventListener('mousemove',e=>{
   if(selectedDot){
     const rect=magCanvas.getBoundingClientRect();
-    selectedDot.x=e.clientX-rect.left;
-    selectedDot.y=e.clientY-rect.top;
+    selectedDot.x=Math.min(Math.max(e.clientX-rect.left,15),235);
+    selectedDot.y=Math.min(Math.max(e.clientY-rect.top,15),235);
   }
 });
 function drawMagnetic(){
@@ -257,25 +267,81 @@ sliderCanvas.addEventListener('mousedown',e=>{
   const x=e.clientX-rect.left;
   if(x>sliderX && x<sliderX+40) sliderDragging=true;
 });
-window.addEventListener('mouseup',()=>{sliderDragging=false;sliderTarget=20;});
+window.addEventListener('mouseup',()=>{sliderDragging=false;});
 window.addEventListener('mousemove',e=>{
   if(sliderDragging){
     const rect=sliderCanvas.getBoundingClientRect();
-    sliderTarget=e.clientX-rect.left-20;
-    if(sliderTarget<0) sliderTarget=0;
-    if(sliderTarget>210) sliderTarget=210;
+    sliderTarget=Math.min(Math.max(e.clientX-rect.left-20,0),210);
   }
 });
 function drawSlider(){
   sLCtx.clearRect(0,0,sliderCanvas.width,sliderCanvas.height);
-  sliderX+= (sliderTarget - sliderX)*0.2;
-  sLCtx.fillStyle='#555';
-  sLCtx.fillRect(0,30,250,20);
+  sliderX=lerp(sliderX,sliderTarget,0.2);
   sLCtx.fillStyle='#0ff';
   sLCtx.fillRect(sliderX,20,40,40);
+  sLCtx.strokeStyle='#08f';
+  sLCtx.lineWidth=3;
+  sLCtx.strokeRect(sliderX,20,40,40);
   requestAnimationFrame(drawSlider);
 }
 drawSlider();
+
+// Soft Wave Fidget
+const waveCanvas=document.getElementById('wave');
+const wCtx=waveCanvas.getContext('2d');
+let points=[];
+for(let i=0;i<10;i++) points.push({x:i*25+12.5,y:125,vy:0});
+waveCanvas.addEventListener('mousedown',e=>{
+  const rect=waveCanvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left;
+  const my=e.clientY-rect.top;
+  for(let p of points){
+    if(Math.abs(mx-p.x)<12.5) p.vy=my-p.y;
+  }
+});
+function drawWave(){
+  wCtx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
+  wCtx.beginPath();
+  wCtx.moveTo(0,125);
+  for(let p of points){
+    p.vy+=-(p.y-125)*0.05;
+    p.vy*=0.9;
+    p.y+=p.vy;
+    wCtx.lineTo(p.x,p.y);
+  }
+  wCtx.strokeStyle='#0ff';
+  wCtx.lineWidth=3;
+  wCtx.stroke();
+  requestAnimationFrame(drawWave);
+}
+drawWave();
+
+// Color Ripple Touch
+const rippleCanvas=document.getElementById('ripple');
+const rCtx=rippleCanvas.getContext('2d');
+let ripples=[];
+rippleCanvas.addEventListener('mousedown',e=>{
+  const rect=rippleCanvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left;
+  const my=e.clientY-rect.top;
+  ripples.push({x:mx,y:my,radius:0,alpha:1,hue:Math.random()*360});
+});
+function drawRipple(){
+  rCtx.clearRect(0,0,rippleCanvas.width,rippleCanvas.height);
+  for(let i=ripples.length-1;i>=0;i--){
+    let r=ripples[i];
+    r.radius+=2;
+    r.alpha*=0.95;
+    rCtx.beginPath();
+    rCtx.arc(r.x,r.y,r.radius,0,Math.PI*2);
+    rCtx.strokeStyle=`hsla(${r.hue},80%,60%,${r.alpha})`;
+    rCtx.lineWidth=3;
+    rCtx.stroke();
+    if(r.alpha<0.05) ripples.splice(i,1);
+  }
+  requestAnimationFrame(drawRipple);
+}
+drawRipple();
 </script>
 </body>
 </html>
